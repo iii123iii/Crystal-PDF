@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, Eye, EyeOff, Download, Loader2, FileText } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 export default function UnlockTool() {
   const [file, setFile] = useState<File | null>(null)
@@ -8,6 +9,7 @@ export default function UnlockTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function handleFile(f: File) {
     if (f.type !== 'application/pdf') { setError('Only PDF files are accepted.'); return }
@@ -50,6 +52,7 @@ export default function UnlockTool() {
       a.download = 'unlocked.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', 'Password removed — downloading unlocked.pdf')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to unlock PDF.')
     } finally {

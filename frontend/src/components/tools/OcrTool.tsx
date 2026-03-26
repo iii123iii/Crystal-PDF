@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, FileText, Download, Loader2, ChevronDown } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 interface Language {
   code: string
@@ -31,6 +32,7 @@ export default function OcrTool() {
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function handleFile(f: File) {
     if (f.type !== 'application/pdf') { setError('Only PDF files are accepted.'); return }
@@ -67,6 +69,7 @@ export default function OcrTool() {
       a.download = 'ocr.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', 'OCR complete — downloading ocr.pdf')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'OCR failed.')
     } finally {

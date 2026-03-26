@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 import { UploadCloud, X, FileText, Loader2, Download, GripVertical } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 interface PdfFile {
   id: string
@@ -19,6 +20,7 @@ export default function MergeTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function addFiles(incoming: FileList | null) {
     if (!incoming) return
@@ -75,6 +77,7 @@ export default function MergeTool() {
       a.download = 'merged.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', `Merged ${files.length} files — downloading merged.pdf`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Merge failed. Is the backend running?')
     } finally {

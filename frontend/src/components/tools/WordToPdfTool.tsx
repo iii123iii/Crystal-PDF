@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, FileText, Download, Loader2 } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 const ACCEPTED_TYPES: Record<string, string> = {
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
@@ -17,6 +18,7 @@ export default function WordToPdfTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function handleFile(f: File) {
     if (!ACCEPTED_TYPES[f.type]) {
@@ -51,10 +53,12 @@ export default function WordToPdfTool() {
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
+      const outName = file.name.replace(/\.[^.]+$/, '') + '.pdf'
       a.href = url
-      a.download = file.name.replace(/\.[^.]+$/, '') + '.pdf'
+      a.download = outName
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', `Converted — downloading ${outName}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Conversion failed.')
     } finally {

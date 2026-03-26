@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, Eye, EyeOff, Download, Loader2, FileText } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 export default function ProtectTool() {
   const [file, setFile] = useState<File | null>(null)
@@ -12,6 +13,7 @@ export default function ProtectTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   const passwordMismatch = confirmPassword.length > 0 && userPassword !== confirmPassword
   const canSubmit = file !== null && userPassword.length > 0 && !passwordMismatch
@@ -49,6 +51,7 @@ export default function ProtectTool() {
       a.download = 'protected.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', 'PDF encrypted — downloading protected.pdf')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to protect PDF.')
     } finally {

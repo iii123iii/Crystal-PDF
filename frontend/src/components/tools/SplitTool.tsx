@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import localforage from 'localforage'
 import { UploadCloud, Download, Loader2, CheckCircle2 } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 // Worker is copied to public/ as .js by the prebuild/predev script so that
 // any server (including Nginx) serves it with the correct application/javascript
@@ -83,6 +84,7 @@ export default function SplitTool() {
   const [error, setError] = useState<string | null>(null)
   const [restoring, setRestoring] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   // Restore persisted file on mount
   useEffect(() => {
@@ -149,6 +151,7 @@ export default function SplitTool() {
       a.download = 'extracted.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', `Extracted ${selected.size} page${selected.size > 1 ? 's' : ''} — downloading extracted.pdf`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Extraction failed.')
     } finally {

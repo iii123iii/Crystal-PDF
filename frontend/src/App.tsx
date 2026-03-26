@@ -1,6 +1,7 @@
 import Sidebar from './components/layout/Sidebar'
 import Header from './components/layout/Header'
 import Workspace from './components/layout/Workspace'
+import ToastContainer from './components/ui/ToastContainer'
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
         <Header />
         <Workspace />
       </div>
+      <ToastContainer />
     </div>
   )
 }

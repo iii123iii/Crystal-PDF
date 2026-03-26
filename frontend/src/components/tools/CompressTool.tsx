@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, FileText, Download, Loader2 } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 interface Level {
   id: string
@@ -27,6 +28,7 @@ export default function CompressTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError]   = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   // Slider position ↔ level id
   const sliderIndex = LEVELS.findIndex((l) => l.id === level)
@@ -71,7 +73,9 @@ export default function CompressTool() {
 
       if (savings > 0) {
         const pct = ((savings / file.size) * 100).toFixed(1)
-        setError(`✓ Saved ${formatBytes(savings)} (${pct}% reduction)`)
+        addToast('success', `Saved ${formatBytes(savings)} (${pct}% reduction) — downloading compressed.pdf`)
+      } else {
+        addToast('success', 'Compressed — downloading compressed.pdf')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Compression failed.')
@@ -79,8 +83,6 @@ export default function CompressTool() {
       setLoading(false)
     }
   }
-
-  const isSuccess = error?.startsWith('✓')
 
   return (
     <div className="max-w-lg mx-auto w-full space-y-6">
@@ -144,11 +146,7 @@ export default function CompressTool() {
       </div>
 
       {error && (
-        <p className={`text-sm rounded-lg px-4 py-3 border ${
-          isSuccess
-            ? 'text-green-400 bg-green-500/10 border-green-500/20'
-            : 'text-red-400 bg-red-500/10 border-red-500/20'
-        }`}>
+        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
           {error}
         </p>
       )}

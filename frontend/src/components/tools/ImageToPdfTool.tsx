@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ReactSortable } from 'react-sortablejs'
 import { UploadCloud, GripVertical, X, Image, Download, Loader2 } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const ACCEPT_STRING = ACCEPTED_MIME.join(',')
@@ -16,6 +17,7 @@ export default function ImageToPdfTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function addFiles(incoming: FileList | null) {
     if (!incoming) return
@@ -65,6 +67,7 @@ export default function ImageToPdfTool() {
       a.download = 'images.pdf'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', `${images.length} image${images.length > 1 ? 's' : ''} converted — downloading images.pdf`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Conversion failed.')
     } finally {

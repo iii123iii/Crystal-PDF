@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud, FileText, Download, Loader2 } from 'lucide-react'
+import { useToastStore } from '../../store/useToastStore'
 
 const DPI_OPTIONS = [72, 96, 150, 200, 300]
 
@@ -10,6 +11,7 @@ export default function PdfToImageTool() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const addToast = useToastStore((s) => s.addToast)
 
   function handleFile(f: File) {
     if (f.type !== 'application/pdf') { setError('Only PDF files are accepted.'); return }
@@ -44,6 +46,7 @@ export default function PdfToImageTool() {
       a.download = 'pages.zip'
       a.click()
       URL.revokeObjectURL(url)
+      addToast('success', `Converted to ${format.toUpperCase()} at ${dpi} DPI — downloading pages.zip`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Conversion failed.')
     } finally {
