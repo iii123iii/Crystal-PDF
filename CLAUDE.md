@@ -2,7 +2,7 @@
 
 Split-architecture PDF processing application.
 
-## Backend (Spring Boot 3 + Java 17 + Gradle)
+## Backend (Spring Boot 3 + Java 21 + Gradle)
 
 ```bash
 cd backend
