@@ -7,6 +7,8 @@ import UnlockTool from '../tools/UnlockTool'
 import WordToPdfTool from '../tools/WordToPdfTool'
 import PdfToImageTool from '../tools/PdfToImageTool'
 import ImageToPdfTool from '../tools/ImageToPdfTool'
+import CompressTool from '../tools/CompressTool'
+import OcrTool from '../tools/OcrTool'
 
 interface ToolViewProps {
   toolId: string
@@ -22,6 +24,8 @@ const toolComponents: Partial<Record<string, React.ComponentType>> = {
   'word-to-pdf': WordToPdfTool,
   'pdf-to-image': PdfToImageTool,
   'image-to-pdf': ImageToPdfTool,
+  compress: CompressTool,
+  ocr: OcrTool,
 }
 
 export default function ToolView({ toolId, onBack }: ToolViewProps) {
