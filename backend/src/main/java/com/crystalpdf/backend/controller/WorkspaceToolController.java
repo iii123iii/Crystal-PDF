@@ -2,22 +2,31 @@ package com.crystalpdf.backend.controller;
 
 import com.crystalpdf.backend.dto.CompressRequest;
 import com.crystalpdf.backend.dto.DocumentResponse;
+import com.crystalpdf.backend.dto.MergeRequest;
 import com.crystalpdf.backend.dto.OcrRequest;
+import com.crystalpdf.backend.dto.PdfToImageRequest;
 import com.crystalpdf.backend.dto.ProtectRequest;
 import com.crystalpdf.backend.dto.SplitRequest;
+import com.crystalpdf.backend.dto.UnlockRequest;
 import com.crystalpdf.backend.entity.Document;
 import com.crystalpdf.backend.entity.User;
 import com.crystalpdf.backend.repository.DocumentRepository;
 import com.crystalpdf.backend.service.CompressService;
+import com.crystalpdf.backend.service.MergeService;
 import com.crystalpdf.backend.service.OcrService;
+import com.crystalpdf.backend.service.PdfToImageService;
 import com.crystalpdf.backend.service.ProtectService;
 import com.crystalpdf.backend.service.SplitService;
 import com.crystalpdf.backend.service.StorageService;
+import com.crystalpdf.backend.service.UnlockService;
+import com.crystalpdf.backend.service.WordToPdfService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tool endpoints that operate on a stored document (by ID) and save the
@@ -38,6 +47,10 @@ public class WorkspaceToolController {
     private final ProtectService protectService;
     private final CompressService compressService;
     private final OcrService ocrService;
+    private final MergeService mergeService;
+    private final UnlockService unlockService;
+    private final PdfToImageService pdfToImageService;
+    private final WordToPdfService wordToPdfService;
 
     public WorkspaceToolController(
             DocumentRepository documentRepository,
@@ -45,13 +58,21 @@ public class WorkspaceToolController {
             SplitService splitService,
             ProtectService protectService,
             CompressService compressService,
-            OcrService ocrService) {
+            OcrService ocrService,
+            MergeService mergeService,
+            UnlockService unlockService,
+            PdfToImageService pdfToImageService,
+            WordToPdfService wordToPdfService) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
         this.splitService = splitService;
         this.protectService = protectService;
         this.compressService = compressService;
         this.ocrService = ocrService;
+        this.mergeService = mergeService;
+        this.unlockService = unlockService;
+        this.pdfToImageService = pdfToImageService;
+        this.wordToPdfService = wordToPdfService;
     }
 
     @PostMapping("/split")
@@ -109,6 +130,73 @@ public class WorkspaceToolController {
         return ResponseEntity.ok(DocumentResponse.from(out));
     }
 
+    @PostMapping("/unlock")
+    public ResponseEntity<DocumentResponse> unlock(
+            @PathVariable Long id,
+            @RequestBody UnlockRequest req,
+            @AuthenticationPrincipal User user) throws IOException {
+
+        Document source = loadOwned(id, user);
+        byte[] result = unlockService.unlock(storageService.loadBytes(source), req.password());
+        String name = baseName(source.getOriginalName()) + "_unlocked.pdf";
+        Document out = storageService.storeProcessed(result, name, "application/pdf", user);
+        return ResponseEntity.ok(DocumentResponse.from(out));
+    }
+
+    @PostMapping("/pdf-to-image")
+    public ResponseEntity<DocumentResponse> pdfToImage(
+            @PathVariable Long id,
+            @RequestBody PdfToImageRequest req,
+            @AuthenticationPrincipal User user) throws IOException {
+
+        Document source = loadOwned(id, user);
+        String format = (req.format() != null && !req.format().isBlank()) ? req.format() : "png";
+        int dpi = (req.dpi() != null && req.dpi() >= 72 && req.dpi() <= 300) ? req.dpi() : 150;
+        byte[] result = pdfToImageService.convert(storageService.loadBytes(source), format, dpi);
+        String name = baseName(source.getOriginalName()) + "_images.zip";
+        Document out = storageService.storeProcessed(result, name, "application/zip", user);
+        return ResponseEntity.ok(DocumentResponse.from(out));
+    }
+
+    @PostMapping("/word-to-pdf")
+    public ResponseEntity<DocumentResponse> wordToPdf(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) throws IOException, InterruptedException {
+
+        Document source = loadOwned(id, user);
+        String ext = getExtension(source.getOriginalName());
+        byte[] result = wordToPdfService.convert(storageService.loadBytes(source), ext);
+        String name = baseName(source.getOriginalName()) + ".pdf";
+        Document out = storageService.storeProcessed(result, name, "application/pdf", user);
+        return ResponseEntity.ok(DocumentResponse.from(out));
+    }
+
+    @PostMapping("/merge")
+    public ResponseEntity<DocumentResponse> merge(
+            @PathVariable Long id,
+            @RequestBody MergeRequest req,
+            @AuthenticationPrincipal User user) throws IOException {
+
+        if (req.otherDocumentIds() == null || req.otherDocumentIds().isEmpty()) {
+            throw new IllegalArgumentException("At least one additional document must be selected.");
+        }
+
+        Document primary = loadOwned(id, user);
+        List<byte[]> allBytes = new ArrayList<>();
+        allBytes.add(storageService.loadBytes(primary));
+
+        for (Long otherId : req.otherDocumentIds()) {
+            Document other = documentRepository.findByIdAndOwnerId(otherId, user.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Document " + otherId + " not found."));
+            allBytes.add(storageService.loadBytes(other));
+        }
+
+        byte[] result = mergeService.mergeBytes(allBytes);
+        String name = baseName(primary.getOriginalName()) + "_merged.pdf";
+        Document out = storageService.storeProcessed(result, name, "application/pdf", user);
+        return ResponseEntity.ok(DocumentResponse.from(out));
+    }
+
     // ── helpers ──────────────────────────────────────────────────────────────
 
     private Document loadOwned(Long id, User user) {
@@ -120,5 +208,11 @@ public class WorkspaceToolController {
         if (fileName == null) return "document";
         int dot = fileName.lastIndexOf('.');
         return dot > 0 ? fileName.substring(0, dot) : fileName;
+    }
+
+    private String getExtension(String fileName) {
+        if (fileName == null) return ".docx";
+        int dot = fileName.lastIndexOf('.');
+        return dot >= 0 ? fileName.substring(dot) : ".docx";
     }
 }

@@ -12,9 +12,9 @@ import java.io.IOException;
 @Service
 public class UnlockService {
 
-    public byte[] unlock(MultipartFile file, String password) throws IOException {
+    public byte[] unlock(byte[] pdfBytes, String password) throws IOException {
         try (PDDocument doc = Loader.loadPDF(
-                new RandomAccessReadBuffer(file.getBytes()),
+                new RandomAccessReadBuffer(pdfBytes),
                 password == null ? "" : password);
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
@@ -26,5 +26,9 @@ public class UnlockService {
             doc.save(out);
             return out.toByteArray();
         }
+    }
+
+    public byte[] unlock(MultipartFile file, String password) throws IOException {
+        return unlock(file.getBytes(), password);
     }
 }

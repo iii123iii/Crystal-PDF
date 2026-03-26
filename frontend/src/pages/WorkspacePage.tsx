@@ -11,6 +11,10 @@ import SplitPanel from '../components/workspace/panels/SplitPanel'
 import ProtectPanel from '../components/workspace/panels/ProtectPanel'
 import CompressPanel from '../components/workspace/panels/CompressPanel'
 import OcrPanel from '../components/workspace/panels/OcrPanel'
+import UnlockPanel from '../components/workspace/panels/UnlockPanel'
+import PdfToImagePanel from '../components/workspace/panels/PdfToImagePanel'
+import WordToPdfPanel from '../components/workspace/panels/WordToPdfPanel'
+import MergePanel from '../components/workspace/panels/MergePanel'
 import { useToastStore } from '../store/useToastStore'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
@@ -196,10 +200,17 @@ export default function WorkspacePage() {
           {activeTool === 'ocr' && id && (
             <OcrPanel docId={id} />
           )}
-          {activeTool && !['split', 'protect', 'compress', 'ocr'].includes(activeTool) && (
-            <div className="p-4 text-xs text-slate-600 text-center mt-8">
-              This tool will be available in a future update.
-            </div>
+          {activeTool === 'unlock' && id && (
+            <UnlockPanel docId={id} />
+          )}
+          {activeTool === 'pdf-to-image' && id && (
+            <PdfToImagePanel docId={id} />
+          )}
+          {activeTool === 'word-to-pdf' && id && meta && (
+            <WordToPdfPanel docId={id} docName={meta.originalName} />
+          )}
+          {activeTool === 'merge' && id && meta && (
+            <MergePanel docId={id} docName={meta.originalName} />
           )}
         </WorkspaceToolPanel>
 

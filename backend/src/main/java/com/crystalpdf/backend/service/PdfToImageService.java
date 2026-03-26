@@ -18,11 +18,11 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class PdfToImageService {
 
-    public byte[] convert(MultipartFile file, String format, int dpi) throws IOException {
+    public byte[] convert(byte[] pdfBytes, String format, int dpi) throws IOException {
         String fmt = format.equalsIgnoreCase("jpg") ? "jpg" : "png";
         String imageioFormat = fmt.equals("jpg") ? "JPEG" : "PNG";
 
-        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(file.getBytes()));
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(pdfBytes));
              ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(zipOut)) {
 
@@ -43,5 +43,9 @@ public class PdfToImageService {
             zos.finish();
             return zipOut.toByteArray();
         }
+    }
+
+    public byte[] convert(MultipartFile file, String format, int dpi) throws IOException {
+        return convert(file.getBytes(), format, dpi);
     }
 }

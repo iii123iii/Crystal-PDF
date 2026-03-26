@@ -12,8 +12,8 @@ import java.util.List;
 @Service
 public class MergeService {
 
-    public byte[] merge(List<MultipartFile> files) throws IOException {
-        if (files == null || files.size() < 2) {
+    public byte[] mergeBytes(List<byte[]> pdfBytesList) throws IOException {
+        if (pdfBytesList == null || pdfBytesList.size() < 2) {
             throw new IllegalArgumentException("At least two PDF files are required to merge.");
         }
 
@@ -21,12 +21,22 @@ public class MergeService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         merger.setDestinationStream(out);
 
-        for (MultipartFile file : files) {
-            // PDFBox 3.x requires RandomAccessRead — wrap the bytes
-            merger.addSource(new RandomAccessReadBuffer(file.getBytes()));
+        for (byte[] pdfBytes : pdfBytesList) {
+            merger.addSource(new RandomAccessReadBuffer(pdfBytes));
         }
 
         merger.mergeDocuments(null);
         return out.toByteArray();
+    }
+
+    public byte[] merge(List<MultipartFile> files) throws IOException {
+        if (files == null || files.size() < 2) {
+            throw new IllegalArgumentException("At least two PDF files are required to merge.");
+        }
+        List<byte[]> bytesList = new java.util.ArrayList<>();
+        for (MultipartFile file : files) {
+            bytesList.add(file.getBytes());
+        }
+        return mergeBytes(bytesList);
     }
 }

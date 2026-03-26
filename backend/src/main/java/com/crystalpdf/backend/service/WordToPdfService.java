@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Service
@@ -14,17 +15,12 @@ public class WordToPdfService {
 
     private static final long TIMEOUT_MS = 60_000;
 
-    public byte[] convert(MultipartFile file) throws IOException, InterruptedException {
-        String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
-        String extension = originalName.contains(".")
-                ? originalName.substring(originalName.lastIndexOf('.'))
-                : ".docx";
-
+    public byte[] convert(byte[] fileBytes, String extension) throws IOException, InterruptedException {
         Path tempInput = Files.createTempFile("crystalpdf-input-", extension);
         Path tempOutputDir = Files.createTempDirectory("crystalpdf-out-");
 
         try {
-            Files.write(tempInput, file.getBytes());
+            Files.write(tempInput, fileBytes);
 
             ProcessBuilder pb = new ProcessBuilder(
                     "libreoffice", "--headless", "--convert-to", "pdf",
@@ -43,7 +39,7 @@ public class WordToPdfService {
 
             String processOutput = new String(process.getInputStream().readAllBytes());
 
-            boolean finished = process.waitFor(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS);
+            boolean finished = process.waitFor(TIMEOUT_MS, TimeUnit.MILLISECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 throw new IOException("LibreOffice conversion timed out.");
@@ -69,5 +65,13 @@ public class WordToPdfService {
                 });
             }
         }
+    }
+
+    public byte[] convert(MultipartFile file) throws IOException, InterruptedException {
+        String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
+        String extension = originalName.contains(".")
+                ? originalName.substring(originalName.lastIndexOf('.'))
+                : ".docx";
+        return convert(file.getBytes(), extension);
     }
 }
