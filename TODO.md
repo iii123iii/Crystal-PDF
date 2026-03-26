@@ -16,9 +16,9 @@
 - [x] Implement `/api/auth/register` and `/api/auth/login` endpoints.
 
 ## Phase 2: File Persistence & Tracking
-- [ ] Create `Document` entity mapping files to their owner (`User`).
-- [ ] Implement a `StorageService` to handle saving/retrieving files to/from the local disk.
-- [ ] Implement protected endpoints: `/api/documents/upload`, `/api/documents/{id}/download`, and `/api/documents/my-files`.
+- [x] Create `Document` entity mapping files to their owner (`User`).
+- [x] Implement a `StorageService` to handle saving/retrieving files to/from the local disk.
+- [x] Implement protected endpoints: `/api/documents/upload`, `/api/documents/{id}/download`, and `/api/documents/my-files`.
 
 ## Phase 3: Frontend Auth & Routing
 - [ ] Set up React Router in the frontend.

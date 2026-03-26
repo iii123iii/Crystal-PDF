@@ -12,6 +12,9 @@ frontend/public/pdf.worker.min.js
 *.iml
 .vscode/
 
+# User file storage (local dev)
+storage/
+
 # OS
 .DS_Store
 Thumbs.db
