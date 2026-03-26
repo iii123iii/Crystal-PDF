@@ -1,32 +1,68 @@
 package com.crystalpdf.backend.service;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class OcrService {
 
     private static final long TIMEOUT_SEC = 300;
+    private static final int RENDER_DPI   = 200;
 
+    /**
+     * Runs Tesseract OCR on the uploaded PDF and returns a searchable PDF.
+     *
+     * Strategy: Tesseract 4.x does not support PDF input directly.
+     * Pages are rendered to PNG images via PDFBox, then passed to Tesseract
+     * as an image list file so a single process handles the whole document.
+     */
     public byte[] ocr(MultipartFile file, String language) throws IOException, InterruptedException {
         if (language == null || language.isBlank()) language = "eng";
 
-        Path tempInput      = Files.createTempFile("crystalpdf-ocr-in-",  ".pdf");
-        Path tempOutputBase = Files.createTempFile("crystalpdf-ocr-out-", "");
-        Path tempOutput     = tempOutputBase.resolveSibling(tempOutputBase.getFileName() + ".pdf");
+        Path tempDir = Files.createTempDirectory("crystalpdf-ocr-");
 
-        try {
-            Files.write(tempInput, file.getBytes());
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(file.getBytes()))) {
 
+            // 1. Render every page to a PNG inside the temp dir
+            PDFRenderer renderer = new PDFRenderer(doc);
+            List<Path> pageImages = new ArrayList<>();
+
+            for (int i = 0; i < doc.getNumberOfPages(); i++) {
+                BufferedImage img = renderer.renderImageWithDPI(i, RENDER_DPI, ImageType.RGB);
+                Path imgPath = tempDir.resolve(String.format("page_%04d.png", i + 1));
+                ImageIO.write(img, "PNG", imgPath.toFile());
+                pageImages.add(imgPath);
+            }
+
+            // 2. Write an image-list file (Tesseract 4+ accepts these as input)
+            Path listFile = tempDir.resolve("pages.txt");
+            Files.write(listFile, pageImages.stream()
+                    .map(Path::toString)
+                    .collect(Collectors.toList()));
+
+            // 3. Run Tesseract on the list file → produces output.pdf
+            Path outputBase = tempDir.resolve("output");
             ProcessBuilder pb = new ProcessBuilder(
                     "tesseract",
-                    tempInput.toString(),
-                    tempOutputBase.toString(),
+                    listFile.toString(),
+                    outputBase.toString(),
                     "-l", language,
                     "pdf"
             );
@@ -37,10 +73,9 @@ public class OcrService {
                 process = pb.start();
             } catch (IOException e) {
                 throw new IOException(
-                    "Tesseract not found. Install tesseract-ocr and ensure it is on PATH.", e);
+                        "Tesseract not found. Install tesseract-ocr and ensure it is on PATH.", e);
             }
 
-            // Drain output before waitFor to prevent buffer deadlock
             String processOutput = new String(process.getInputStream().readAllBytes());
 
             boolean finished = process.waitFor(TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -50,15 +85,18 @@ public class OcrService {
             }
             if (process.exitValue() != 0) {
                 throw new IOException(
-                    "Tesseract failed (exit " + process.exitValue() + "): " + processOutput.trim());
+                        "Tesseract failed (exit " + process.exitValue() + "): " + processOutput.trim());
             }
 
-            return Files.readAllBytes(tempOutput);
+            Path outputPdf = tempDir.resolve("output.pdf");
+            return Files.readAllBytes(outputPdf);
 
         } finally {
-            Files.deleteIfExists(tempInput);
-            Files.deleteIfExists(tempOutputBase);
-            Files.deleteIfExists(tempOutput);
+            // Delete temp dir and all its contents
+            try (Stream<Path> tree = Files.walk(tempDir)) {
+                tree.sorted(Comparator.reverseOrder())
+                    .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException ignored) {} });
+            }
         }
     }
 }
