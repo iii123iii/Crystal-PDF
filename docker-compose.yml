@@ -1,13 +1,39 @@
 services:
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: crystalpdf-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: crystalpdf
+      POSTGRES_USER: crystalpdf
+      POSTGRES_PASSWORD: crystalpdf_secure_password
+    networks:
+      - crystalpdf-net
+    expose:
+      - "5432"
+    volumes:
+      - crystalpdf-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crystalpdf -d crystalpdf"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: crystalpdf-backend
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://postgres:5432/crystalpdf
+      - DB_USERNAME=crystalpdf
+      - DB_PASSWORD=crystalpdf_secure_password
     networks:
       - crystalpdf-net
     # Not exposed to host — only reachable via the frontend proxy
@@ -38,3 +64,6 @@ services:
 networks:
   crystalpdf-net:
     driver: bridge
+
+volumes:
+  crystalpdf-db:
