@@ -30,7 +30,7 @@ export default function MergeTool() {
     }
     setFiles((prev) => [
       ...prev,
-      ...pdfs.map((f) => ({ id: `${f.name}-${f.lastModified}-${f.size}`, file: f })),
+      ...pdfs.map((f) => ({ id: crypto.randomUUID(), file: f })),
     ])
   }
 
