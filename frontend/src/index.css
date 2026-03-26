@@ -8,6 +8,7 @@
   }
 
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    background-color: #0f172a;
+    @apply text-white antialiased;
   }
 }

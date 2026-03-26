@@ -1,16 +1,19 @@
-import { type ReactNode } from 'react'
+import Dashboard from '../dashboard/Dashboard'
+import ToolView from '../dashboard/ToolView'
 
 interface WorkspaceProps {
-  children?: ReactNode
+  activeTool: string | null
+  onToolSelect: (id: string) => void
+  onBack: () => void
 }
 
-export default function Workspace({ children }: WorkspaceProps) {
+export default function Workspace({ activeTool, onToolSelect, onBack }: WorkspaceProps) {
   return (
     <main className="flex-1 overflow-auto p-8">
-      {children ?? (
-        <div className="flex h-full items-center justify-center text-gray-600 text-sm">
-          Select a tool from the sidebar to get started.
-        </div>
+      {activeTool ? (
+        <ToolView toolId={activeTool} onBack={onBack} />
+      ) : (
+        <Dashboard onToolSelect={onToolSelect} />
       )}
     </main>
   )
