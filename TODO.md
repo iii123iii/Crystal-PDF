@@ -1,64 +1,55 @@
-# Crystal-PDF: Project Roadmap & Specification
+# Crystal-PDF: Project Roadmap & Specification (V2 - Viewer & Auth Centric)
 
 ## Project Identity
 - **Name:** Crystal-PDF
-- **Architecture:** Split-architecture (Decoupled Backend & Frontend)
-- **Frontend Stack:** React, Vite, Tailwind CSS, Zustand, PDF.js, SortableJS.
+- **Architecture:** Stateful Split-architecture (Decoupled Backend & Frontend)
+- **Frontend Stack:** React, Vite, Tailwind CSS, Zustand, React Router, PDF.js, SortableJS.
 - **Backend Stack:** Java 21, Spring Boot 3, Gradle.
+- **Data & Auth:** PostgreSQL, Spring Data JPA, Spring Security (JWT).
 - **Core Processing:** Apache PDFBox, OpenPDF.
 - **System Dependencies:** LibreOffice, Ghostscript, Tesseract OCR, QPDF, Python 3 (OpenCV).
 
-## Phase 1: Project Initialization
-- [ ] Create directory structure (`/backend`, `/frontend`).
-- [ ] Setup `CLAUDE.md` with build, test, and run commands for both tiers.
-- [ ] Initialize Git repository.
+## Phase 1: Database & Backend Auth Scaffold
+- [x] Add PostgreSQL driver, Spring Data JPA, Spring Security, and JWT dependencies to `build.gradle`.
+- [x] Configure `application.yml` for PostgreSQL connection and local file storage paths.
+- [x] Create `User` entity, `UserRepository`, and Spring Security config (JWT Filter, Authentication Manager).
+- [x] Implement `/api/auth/register` and `/api/auth/login` endpoints.
 
-## Phase 2: Backend Scaffold (Spring Boot 3)
-- [ ] Initialize Spring Boot 3 project with Java 21 and Gradle.
-- [ ] Add dependencies: Spring Web, Spring Security (basic), Apache PDFBox, OpenPDF.
-- [ ] Implement `/api/health` and configure CORS to accept requests from the Vite dev server.
+## Phase 2: File Persistence & Tracking
+- [ ] Create `Document` entity mapping files to their owner (`User`).
+- [ ] Implement a `StorageService` to handle saving/retrieving files to/from the local disk.
+- [ ] Implement protected endpoints: `/api/documents/upload`, `/api/documents/{id}/download`, and `/api/documents/my-files`.
 
-## Phase 3: Frontend Scaffold (React + Vite + Tailwind)
-- [ ] Initialize Vite + React + TypeScript project in `/frontend`.
-- [ ] Install Tailwind CSS, PostCSS, Autoprefixer, and Lucide React icons.
-- [ ] Configure Tailwind utility classes and theme variables.
-- [ ] Create responsive Layout components (Sidebar, Header, Main Workspace).
+## Phase 3: Frontend Auth & Routing
+- [ ] Set up React Router in the frontend.
+- [ ] Create Login and Register page components with Tailwind.
+- [ ] Update Zustand store to handle JWT tokens and user session state.
+- [ ] Create an `AuthGuard` wrapper component to protect internal dashboard routes.
 
-## Phase 4: Multi-Tier Dockerization
-- [ ] **Backend:** Create Dockerfile based on Ubuntu/Debian (JRE 21) installing `libreoffice`, `ghostscript`, `qpdf`, `tesseract-ocr`, and `python3`.
-- [ ] **Frontend:** Create multi-stage Dockerfile (Node.js build -> Nginx serving static files).
-- [ ] Create `docker-compose.yml` networking both tiers, optimized for a lightweight VPS environment.
+## Phase 4: The Dashboard & History View
+- [ ] Build the User Dashboard UI (landing page after login).
+- [ ] Fetch and display a table/grid of the user's previously uploaded and processed files.
+- [ ] Implement "Open in Workspace" and "Delete" actions for history items.
 
-## Phase 5: MVP - Merge Tool
-- [ ] **Backend:** Implement `/api/v1/merge` POST endpoint using PDFBox.
-- [ ] **Frontend:** Build a React "Merge" view with a drag-and-drop file uploader zone.
-- [ ] Implement frontend logic to handle `FormData` submission and trigger the merged file download.
+## Phase 5: The Central Viewer Workspace (The Core)
+- [ ] Build the `Workspace` React component: A full-screen layout with a central PDF viewing area and a sticky tool sidebar.
+- [ ] Integrate `PDF.js` to render the *active* document in the center of the screen.
+- [ ] Implement Zustand state to track the `activeDocumentId` currently open in the viewer.
 
-## Phase 6: Global State & Visual Workspace
-- [ ] **Frontend:** Implement **Zustand** store for global file and UI state management.
-- [ ] **Frontend:** Integrate **localforage/IndexedDB** to persist PDF Blobs locally across sessions.
-- [ ] **Backend/Frontend:** Implement `/api/v1/split` and build a visual workspace using PDF.js to render Tailwind-styled thumbnails for page selection.
+## Phase 6: Refactoring Tools - Operations on Active File
+- [ ] **Backend:** Refactor existing tool logic (Merge, Split, Protect) to accept a `documentId`, process it from storage, and save the output as a *new* document linked to the user.
+- [ ] **Frontend:** Build tool UI panels that slide out over the sidebar.
+- [ ] Wire up the Split tool: Allow users to click pages rendered by PDF.js in the main viewer to select ranges for extraction.
 
-## Phase 7: Security (Protect/Unlock)
-- [ ] **Backend:** Implement PDFBox encryption (`StandardProtectionPolicy`).
-- [ ] **Backend:** Implement decryption (credential stripping).
-- [ ] **Frontend:** Create "Protect" and "Unlock" React components with secure password input fields and validation states.
+## Phase 7: Advanced Conversions & OCR
+- [ ] **Backend:** Adapt Document-to-PDF, PDF-to-Image, and Image-to-PDF logic to the new `StorageService` flow.
+- [ ] **Backend:** Adapt OCR and Compression endpoints.
+- [ ] **Frontend:** Add these tools to the Workspace sidebar, ensuring they visually update the active document or trigger a download/save prompt.
 
-## Phase 8: Advanced Conversions
-- [ ] **Backend:** Implement Document-to-PDF (Word, Excel) executing `libreoffice --headless`.
-- [ ] **Backend:** Implement PDF-to-Image (PNG/JPG ZIP) using PDFBox `PDFRenderer`.
-- [ ] **Backend:** Implement Image-to-PDF (scaling images to A4).
-- [ ] **Frontend:** Build conversion UI components with Tailwind-styled drag-and-drop zones and strict MIME-type filtering.
-
-## Phase 9: Optimization & OCR
-- [ ] **Backend:** Implement `/api/v1/compress` (executing `qpdf` and `ghostscript` via ProcessBuilder).
-- [ ] **Backend:** Implement `/api/v1/ocr` (executing `tesseract` via ProcessBuilder).
-- [ ] **Frontend:** Build complex UI controls (range sliders for compression, dropdowns for OCR languages).
-
-## Phase 10: Final Polish & Branding
-- [ ] **Backend:** Global `@ControllerAdvice` for clean error JSON responses and temporary file cleanup in `finally` blocks.
-- [ ] **Frontend:** Implement a global toast notification system for success/error feedback.
-- [ ] Final UI audit: Ensure the Tailwind design is cohesive and all references strictly say "Crystal-PDF".
+## Phase 8: Polish & Cleanup
+- [ ] **Backend:** Ensure a scheduled task or cron job is in place to clean up orphaned temporary files, while keeping user-saved files intact.
+- [ ] **Frontend:** Implement global toast notifications for all auth and document processing actions.
+- [ ] Run `./gradlew build` and `npm run build` to ensure the refactored architecture compiles cleanly.
 
 ---
 **Operating Rules for Claude:**

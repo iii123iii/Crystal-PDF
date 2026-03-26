@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: crystalpdf-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/crystalpdf}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 500MB
+
+server:
+  port: 8080
+
+crystalpdf:
+  storage:
+    path: ${STORAGE_PATH:./storage}
+  jwt:
+    # Base64-encoded secret — must be at least 256 bits. Override in production via env var.
+    secret: ${JWT_SECRET:Y3J5c3RhbHBkZi12Mi1qd3Qtc2VjcmV0LWtleS1wbGVhc2UtY2hhbmdlLWluLXByb2R1Y3Rpb24=}
+    expiration-ms: 604800000  # 7 days
