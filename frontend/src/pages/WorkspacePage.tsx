@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as pdfjsLib from 'pdfjs-dist'
-import { ArrowLeft, ZoomIn, ZoomOut, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ZoomIn, ZoomOut, Loader2, AlertCircle, LayoutGrid } from 'lucide-react'
 import { apiFetch } from '../lib/api'
 import { PdfViewer } from '../components/workspace/PdfViewer'
 import WorkspaceToolSidebar from '../components/workspace/WorkspaceToolSidebar'
 import WorkspaceToolPanel from '../components/workspace/WorkspaceToolPanel'
+import PageThumbnailStrip from '../components/workspace/PageThumbnailStrip'
 import SplitPanel from '../components/workspace/panels/SplitPanel'
 import ProtectPanel from '../components/workspace/panels/ProtectPanel'
 import CompressPanel from '../components/workspace/panels/CompressPanel'
@@ -39,6 +40,9 @@ export default function WorkspacePage() {
 
   // Split-tool page selection state
   const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set())
+
+  // Page thumbnail strip
+  const [showPages, setShowPages] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -149,6 +153,21 @@ export default function WorkspacePage() {
             <ZoomIn size={15} />
           </button>
         </div>
+
+        <div className="w-px h-5 bg-white/[0.07] shrink-0" />
+
+        <button
+          onClick={() => setShowPages((v) => !v)}
+          disabled={!pdfDoc}
+          className="w-7 h-7 rounded flex items-center justify-center transition-colors disabled:opacity-30 shrink-0"
+          style={{
+            color: showPages ? '#93c5fd' : undefined,
+            background: showPages ? 'rgba(147,197,253,0.1)' : undefined,
+          }}
+          title="Toggle pages panel"
+        >
+          <LayoutGrid size={15} className={showPages ? '' : 'text-slate-400 hover:text-white'} />
+        </button>
       </header>
 
       {/* ── Main area ─────────────────────────────────────────────────────────── */}
@@ -184,37 +203,53 @@ export default function WorkspacePage() {
           )}
         </WorkspaceToolPanel>
 
-        {/* PDF viewer area */}
-        <div
-          className="flex-1 overflow-auto"
-          style={{ background: '#101c2e' }}
-        >
-          {loading ? (
-            <div className="h-full flex items-center justify-center gap-3 text-slate-500">
-              <Loader2 size={20} className="animate-spin" />
-              <span className="text-sm">Loading document…</span>
-            </div>
-          ) : error ? (
-            <div className="h-full flex flex-col items-center justify-center gap-3 text-slate-500">
-              <AlertCircle size={32} className="text-slate-600" />
-              <p className="text-sm text-slate-400">{error}</p>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="mt-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Return to dashboard
-              </button>
-            </div>
-          ) : pdfDoc ? (
-            <PdfViewer
+        {/* PDF viewer + thumbnail strip side by side */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* PDF viewer area */}
+          <div
+            className="flex-1 overflow-auto"
+            style={{ background: '#101c2e' }}
+          >
+            {loading ? (
+              <div className="h-full flex items-center justify-center gap-3 text-slate-500">
+                <Loader2 size={20} className="animate-spin" />
+                <span className="text-sm">Loading document…</span>
+              </div>
+            ) : error ? (
+              <div className="h-full flex flex-col items-center justify-center gap-3 text-slate-500">
+                <AlertCircle size={32} className="text-slate-600" />
+                <p className="text-sm text-slate-400">{error}</p>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="mt-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Return to dashboard
+                </button>
+              </div>
+            ) : pdfDoc ? (
+              <PdfViewer
+                pdfDoc={pdfDoc}
+                scale={scale}
+                onPageChange={setCurrentPage}
+                selectionMode={isSelectionMode}
+                selectedPages={selectedPages}
+                onPageClick={togglePage}
+              />
+            ) : null}
+          </div>
+
+          {/* Page thumbnail strip (right side) */}
+          {pdfDoc && (
+            <PageThumbnailStrip
               pdfDoc={pdfDoc}
-              scale={scale}
-              onPageChange={setCurrentPage}
-              selectionMode={isSelectionMode}
-              selectedPages={selectedPages}
-              onPageClick={togglePage}
+              open={showPages}
+              currentPage={currentPage}
+              selectedPages={isSelectionMode ? selectedPages : undefined}
+              onPageClick={(n) => {
+                if (isSelectionMode) togglePage(n)
+              }}
             />
-          ) : null}
+          )}
         </div>
       </div>
     </div>

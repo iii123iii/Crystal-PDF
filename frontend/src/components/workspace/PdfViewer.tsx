@@ -88,7 +88,7 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
   }, [pageNum, stableOnVisible])
 
   return (
-    <div ref={wrapRef} className="mb-5 relative">
+    <div id={`page-${pageNum}`} ref={wrapRef} className="mb-5 relative">
       {!rendered && (
         <div className="bg-white/10 animate-pulse rounded" style={{ width: 595, height: 842 }} />
       )}
