@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { UploadCloud, X, FileText, Loader2, Download } from 'lucide-react'
+import { ReactSortable } from 'react-sortablejs'
+import { UploadCloud, X, FileText, Loader2, Download, GripVertical } from 'lucide-react'
 
 interface PdfFile {
   id: string
@@ -86,7 +87,7 @@ export default function MergeTool() {
       <div>
         <h2 className="text-2xl font-bold text-white mb-1">Merge PDF</h2>
         <p className="text-slate-400 text-sm">
-          Combine multiple PDF files into a single document. Files are merged in the order listed.
+          Combine multiple PDF files into a single document. Drag the handles to reorder.
         </p>
       </div>
 
@@ -120,14 +121,25 @@ export default function MergeTool() {
         />
       </div>
 
-      {/* File list */}
+      {/* Sortable file list */}
       {files.length > 0 && (
-        <ul className="space-y-2">
+        <ReactSortable
+          tag="ul"
+          list={files}
+          setList={setFiles}
+          handle=".drag-handle"
+          animation={150}
+          ghostClass="opacity-40"
+          className="space-y-2"
+        >
           {files.map(({ id, file }, index) => (
             <li
               key={id}
-              className="flex items-center gap-3 bg-slate-800/50 border border-slate-700/60 rounded-lg px-4 py-3"
+              className="flex items-center gap-3 bg-slate-800/50 border border-slate-700/60 rounded-lg px-4 py-3 select-none"
             >
+              <span className="drag-handle cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-400 transition-colors shrink-0">
+                <GripVertical size={16} />
+              </span>
               <span className="text-slate-500 text-xs w-5 text-right shrink-0">{index + 1}</span>
               <FileText size={16} className="text-blue-400 shrink-0" />
               <span className="text-sm text-white flex-1 truncate">{file.name}</span>
@@ -140,7 +152,7 @@ export default function MergeTool() {
               </button>
             </li>
           ))}
-        </ul>
+        </ReactSortable>
       )}
 
       {/* Error */}
