@@ -55,7 +55,10 @@ export default function CompressTool() {
 
     try {
       const res = await fetch('/api/v1/compress', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error(`Server error: ${res.status}. Is Ghostscript installed?`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error ?? `Server error ${res.status}`)
+      }
 
       const blob = await res.blob()
       const savings = file.size - blob.size

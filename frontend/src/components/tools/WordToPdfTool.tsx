@@ -43,7 +43,10 @@ export default function WordToPdfTool() {
 
     try {
       const res = await fetch('/api/v1/convert/word-to-pdf', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error(`Server error: ${res.status}. Is LibreOffice installed?`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error ?? `Server error ${res.status}`)
+      }
 
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)

@@ -15,11 +15,6 @@ public class CompressService {
     private static final Set<String> VALID_LEVELS = Set.of("screen", "ebook", "printer", "prepress");
     private static final long TIMEOUT_SEC = 120;
 
-    /**
-     * Compresses a PDF using Ghostscript.
-     *
-     * @param level Ghostscript PDF settings: screen | ebook | printer | prepress
-     */
     public byte[] compress(MultipartFile file, String level) throws IOException, InterruptedException {
         if (!VALID_LEVELS.contains(level)) {
             throw new IllegalArgumentException("Invalid compression level: " + level);
@@ -44,14 +39,25 @@ public class CompressService {
             );
             pb.redirectErrorStream(true);
 
-            Process process = pb.start();
+            Process process;
+            try {
+                process = pb.start();
+            } catch (IOException e) {
+                throw new IOException(
+                    "Ghostscript not found. Install ghostscript and ensure it is on PATH.", e);
+            }
+
+            // Drain output before waitFor to prevent buffer deadlock
+            String processOutput = new String(process.getInputStream().readAllBytes());
+
             boolean finished = process.waitFor(TIMEOUT_SEC, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
-                throw new IOException("Ghostscript compression timed out.");
+                throw new IOException("Ghostscript timed out after " + TIMEOUT_SEC + "s.");
             }
             if (process.exitValue() != 0) {
-                throw new IOException("Ghostscript exited with code " + process.exitValue());
+                throw new IOException(
+                    "Ghostscript failed (exit " + process.exitValue() + "): " + processOutput.trim());
             }
 
             return Files.readAllBytes(tempOutput);

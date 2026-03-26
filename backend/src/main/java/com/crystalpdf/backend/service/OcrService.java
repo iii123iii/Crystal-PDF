@@ -13,19 +13,11 @@ public class OcrService {
 
     private static final long TIMEOUT_SEC = 300;
 
-    /**
-     * Runs Tesseract OCR on the uploaded PDF and returns a searchable PDF.
-     *
-     * @param language Tesseract language code(s), e.g. "eng" or "eng+fra"
-     */
     public byte[] ocr(MultipartFile file, String language) throws IOException, InterruptedException {
-        if (language == null || language.isBlank()) {
-            language = "eng";
-        }
+        if (language == null || language.isBlank()) language = "eng";
 
-        Path tempInput      = Files.createTempFile("crystalpdf-ocr-in-",   ".pdf");
-        // Tesseract appends its own extension to the output base path
-        Path tempOutputBase = Files.createTempFile("crystalpdf-ocr-out-",  "");
+        Path tempInput      = Files.createTempFile("crystalpdf-ocr-in-",  ".pdf");
+        Path tempOutputBase = Files.createTempFile("crystalpdf-ocr-out-", "");
         Path tempOutput     = tempOutputBase.resolveSibling(tempOutputBase.getFileName() + ".pdf");
 
         try {
@@ -40,14 +32,25 @@ public class OcrService {
             );
             pb.redirectErrorStream(true);
 
-            Process process = pb.start();
+            Process process;
+            try {
+                process = pb.start();
+            } catch (IOException e) {
+                throw new IOException(
+                    "Tesseract not found. Install tesseract-ocr and ensure it is on PATH.", e);
+            }
+
+            // Drain output before waitFor to prevent buffer deadlock
+            String processOutput = new String(process.getInputStream().readAllBytes());
+
             boolean finished = process.waitFor(TIMEOUT_SEC, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
-                throw new IOException("Tesseract OCR timed out.");
+                throw new IOException("Tesseract OCR timed out after " + TIMEOUT_SEC + "s.");
             }
             if (process.exitValue() != 0) {
-                throw new IOException("Tesseract exited with code " + process.exitValue());
+                throw new IOException(
+                    "Tesseract failed (exit " + process.exitValue() + "): " + processOutput.trim());
             }
 
             return Files.readAllBytes(tempOutput);

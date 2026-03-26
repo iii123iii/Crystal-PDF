@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -23,7 +24,7 @@ public class OcrController {
     }
 
     @PostMapping("/ocr")
-    public ResponseEntity<byte[]> ocr(
+    public ResponseEntity<?> ocr(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "language", defaultValue = "eng") String language) {
 
@@ -37,9 +38,9 @@ public class OcrController {
             return ResponseEntity.ok().headers(headers).body(result);
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (IOException | InterruptedException e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 }

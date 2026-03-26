@@ -32,7 +32,16 @@ public class WordToPdfService {
                     tempInput.toString()
             );
             pb.redirectErrorStream(true);
-            Process process = pb.start();
+
+            Process process;
+            try {
+                process = pb.start();
+            } catch (IOException e) {
+                throw new IOException(
+                    "LibreOffice not found. Install libreoffice and ensure it is on PATH.", e);
+            }
+
+            String processOutput = new String(process.getInputStream().readAllBytes());
 
             boolean finished = process.waitFor(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS);
             if (!finished) {
@@ -40,7 +49,8 @@ public class WordToPdfService {
                 throw new IOException("LibreOffice conversion timed out.");
             }
             if (process.exitValue() != 0) {
-                throw new IOException("LibreOffice conversion failed with exit code " + process.exitValue());
+                throw new IOException(
+                    "LibreOffice failed (exit " + process.exitValue() + "): " + processOutput.trim());
             }
 
             try (Stream<Path> files = Files.list(tempOutputDir)) {
