@@ -5,6 +5,7 @@ backend/build/
 # Node / Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/public/pdf.worker.min.js
 
 # IDE
 .idea/

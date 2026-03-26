@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "copy-pdfjs-worker": "node -e \"require('fs').copyFileSync('node_modules/pdfjs-dist/build/pdf.worker.min.mjs','public/pdf.worker.min.js')\"",
+    "prebuild": "npm run copy-pdfjs-worker",
+    "predev": "npm run copy-pdfjs-worker",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

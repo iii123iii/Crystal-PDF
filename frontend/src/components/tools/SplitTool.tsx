@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import localforage from 'localforage'
 import { UploadCloud, Download, Loader2, CheckCircle2 } from 'lucide-react'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
+// Worker is copied to public/ as .js by the prebuild/predev script so that
+// any server (including Nginx) serves it with the correct application/javascript
+// MIME type rather than application/octet-stream.
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 
 const STORAGE_KEY = 'crystalpdf:split-file'
 
