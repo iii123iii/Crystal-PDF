@@ -28,6 +28,15 @@ public class StorageService {
     }
 
     /**
+     * Resolves the configured storage path to an absolute path so that
+     * MultipartFile.transferTo() and Files operations always agree on the
+     * same directory regardless of Tomcat's working directory.
+     */
+    private Path storageRoot() {
+        return Paths.get(storagePath).toAbsolutePath().normalize();
+    }
+
+    /**
      * Saves a multipart file to disk and persists a Document record.
      * Files are stored at {storagePath}/{userId}/{uuid}{ext}.
      */
@@ -43,11 +52,12 @@ public class StorageService {
         }
 
         String storedName = UUID.randomUUID() + ext;
-        Path userDir = Paths.get(storagePath).resolve(String.valueOf(owner.getId()));
+        Path userDir = storageRoot().resolve(String.valueOf(owner.getId()));
         Files.createDirectories(userDir);
 
         Path dest = userDir.resolve(storedName);
-        file.transferTo(dest.toFile());
+        // Use the Path overload — avoids relative-path confusion with Tomcat's working directory
+        file.transferTo(dest);
 
         Document doc = new Document();
         doc.setOwner(owner);
@@ -62,7 +72,7 @@ public class StorageService {
      * Loads a document's file as a Spring Resource for streaming.
      */
     public Resource load(Document doc) throws IOException {
-        Path filePath = Paths.get(storagePath)
+        Path filePath = storageRoot()
                 .resolve(String.valueOf(doc.getOwner().getId()))
                 .resolve(doc.getStoredName());
         Resource resource = new UrlResource(filePath.toUri());
@@ -77,7 +87,7 @@ public class StorageService {
      */
     public void deleteFile(Document doc) {
         try {
-            Path filePath = Paths.get(storagePath)
+            Path filePath = storageRoot()
                     .resolve(String.valueOf(doc.getOwner().getId()))
                     .resolve(doc.getStoredName());
             Files.deleteIfExists(filePath);
