@@ -14,15 +14,14 @@ import java.io.IOException;
 @Service
 public class ProtectService {
 
-    public byte[] protect(MultipartFile file, String userPassword, String ownerPassword) throws IOException {
+    public byte[] protect(byte[] pdfBytes, String userPassword, String ownerPassword) throws IOException {
         if (userPassword == null || userPassword.isBlank()) {
             throw new IllegalArgumentException("User password must not be empty.");
         }
-        // Default owner password to user password if not provided
         String resolvedOwner = (ownerPassword != null && !ownerPassword.isBlank())
                 ? ownerPassword : userPassword;
 
-        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(file.getBytes()));
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(pdfBytes));
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             AccessPermission ap = new AccessPermission();
@@ -34,5 +33,9 @@ public class ProtectService {
             doc.save(out);
             return out.toByteArray();
         }
+    }
+
+    public byte[] protect(MultipartFile file, String userPassword, String ownerPassword) throws IOException {
+        return protect(file.getBytes(), userPassword, ownerPassword);
     }
 }

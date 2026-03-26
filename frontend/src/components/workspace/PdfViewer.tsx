@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
+import { Check } from 'lucide-react'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 
@@ -7,9 +8,19 @@ interface PdfViewerProps {
   pdfDoc: pdfjsLib.PDFDocumentProxy
   scale: number
   onPageChange: (n: number) => void
+  selectionMode?: boolean
+  selectedPages?: Set<number>
+  onPageClick?: (n: number) => void
 }
 
-export function PdfViewer({ pdfDoc, scale, onPageChange }: PdfViewerProps) {
+export function PdfViewer({
+  pdfDoc,
+  scale,
+  onPageChange,
+  selectionMode = false,
+  selectedPages,
+  onPageClick,
+}: PdfViewerProps) {
   const pages = Array.from({ length: pdfDoc.numPages }, (_, i) => i + 1)
 
   return (
@@ -21,6 +32,9 @@ export function PdfViewer({ pdfDoc, scale, onPageChange }: PdfViewerProps) {
           pageNum={n}
           scale={scale}
           onVisible={onPageChange}
+          selectionMode={selectionMode}
+          selected={selectedPages?.has(n) ?? false}
+          onPageClick={onPageClick}
         />
       ))}
     </div>
@@ -34,14 +48,16 @@ interface PdfPageProps {
   pageNum: number
   scale: number
   onVisible: (n: number) => void
+  selectionMode: boolean
+  selected: boolean
+  onPageClick?: (n: number) => void
 }
 
-function PdfPage({ pdfDoc, pageNum, scale, onVisible }: PdfPageProps) {
+function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, onPageClick }: PdfPageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const [rendered, setRendered] = useState(false)
 
-  // Render page onto canvas
   useEffect(() => {
     let cancelled = false
     setRendered(false)
@@ -59,7 +75,6 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible }: PdfPageProps) {
     return () => { cancelled = true }
   }, [pdfDoc, pageNum, scale])
 
-  // Track which page is the "current" one for the top-bar counter
   const stableOnVisible = useCallback(onVisible, [onVisible])
   useEffect(() => {
     const el = wrapRef.current
@@ -74,7 +89,6 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible }: PdfPageProps) {
 
   return (
     <div ref={wrapRef} className="mb-5 relative">
-      {/* Skeleton shown while rendering */}
       {!rendered && (
         <div className="bg-white/10 animate-pulse rounded" style={{ width: 595, height: 842 }} />
       )}
@@ -86,6 +100,27 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible }: PdfPageProps) {
       />
       {rendered && (
         <p className="text-center text-xs text-slate-600 mt-2 select-none">{pageNum}</p>
+      )}
+
+      {/* ── Selection overlay ── */}
+      {rendered && selectionMode && (
+        <button
+          onClick={() => onPageClick?.(pageNum)}
+          className={`
+            absolute inset-0 rounded transition-all duration-150 cursor-pointer
+            ${selected
+              ? 'ring-2 ring-purple-400 ring-offset-2 ring-offset-transparent bg-purple-500/20'
+              : 'bg-transparent hover:bg-white/[0.04] hover:ring-1 hover:ring-white/20'}
+          `}
+          style={{ bottom: 20 }}
+          aria-label={`${selected ? 'Deselect' : 'Select'} page ${pageNum}`}
+        >
+          {selected && (
+            <span className="absolute top-2 right-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
+              <Check size={13} className="text-white" strokeWidth={2.5} />
+            </span>
+          )}
+        </button>
       )}
     </div>
   )

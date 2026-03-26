@@ -26,21 +26,13 @@ public class OcrService {
     private static final long TIMEOUT_SEC = 300;
     private static final int RENDER_DPI   = 200;
 
-    /**
-     * Runs Tesseract OCR on the uploaded PDF and returns a searchable PDF.
-     *
-     * Strategy: Tesseract 4.x does not support PDF input directly.
-     * Pages are rendered to PNG images via PDFBox, then passed to Tesseract
-     * as an image list file so a single process handles the whole document.
-     */
-    public byte[] ocr(MultipartFile file, String language) throws IOException, InterruptedException {
+    public byte[] ocr(byte[] pdfBytes, String language) throws IOException, InterruptedException {
         if (language == null || language.isBlank()) language = "eng";
 
         Path tempDir = Files.createTempDirectory("crystalpdf-ocr-");
 
-        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(file.getBytes()))) {
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(pdfBytes))) {
 
-            // 1. Render every page to a PNG inside the temp dir
             PDFRenderer renderer = new PDFRenderer(doc);
             List<Path> pageImages = new ArrayList<>();
 
@@ -51,13 +43,11 @@ public class OcrService {
                 pageImages.add(imgPath);
             }
 
-            // 2. Write an image-list file (Tesseract 4+ accepts these as input)
             Path listFile = tempDir.resolve("pages.txt");
             Files.write(listFile, pageImages.stream()
                     .map(Path::toString)
                     .collect(Collectors.toList()));
 
-            // 3. Run Tesseract on the list file → produces output.pdf
             Path outputBase = tempDir.resolve("output");
             ProcessBuilder pb = new ProcessBuilder(
                     "tesseract",
@@ -92,11 +82,14 @@ public class OcrService {
             return Files.readAllBytes(outputPdf);
 
         } finally {
-            // Delete temp dir and all its contents
             try (Stream<Path> tree = Files.walk(tempDir)) {
                 tree.sorted(Comparator.reverseOrder())
                     .forEach(p -> { try { Files.deleteIfExists(p); } catch (IOException ignored) {} });
             }
         }
+    }
+
+    public byte[] ocr(MultipartFile file, String language) throws IOException, InterruptedException {
+        return ocr(file.getBytes(), language);
     }
 }

@@ -15,16 +15,12 @@ import java.util.Set;
 @Service
 public class SplitService {
 
-    /**
-     * Extracts the specified pages (1-indexed) from the uploaded PDF and returns
-     * a new PDF containing only those pages, in the order requested.
-     */
-    public byte[] extractPages(MultipartFile file, List<Integer> pages) throws IOException {
+    public byte[] extractPages(byte[] pdfBytes, List<Integer> pages) throws IOException {
         if (pages == null || pages.isEmpty()) {
             throw new IllegalArgumentException("At least one page must be selected.");
         }
 
-        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(file.getBytes()));
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(pdfBytes));
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             int total = doc.getNumberOfPages();
@@ -36,16 +32,19 @@ public class SplitService {
                 }
             }
 
-            // Remove every page NOT in the requested set (iterate in reverse to preserve indices)
             Set<Integer> keepSet = new HashSet<>(pages);
             for (int i = total; i >= 1; i--) {
                 if (!keepSet.contains(i)) {
-                    doc.removePage(i - 1); // PDFBox uses 0-based indices
+                    doc.removePage(i - 1);
                 }
             }
 
             doc.save(out);
             return out.toByteArray();
         }
+    }
+
+    public byte[] extractPages(MultipartFile file, List<Integer> pages) throws IOException {
+        return extractPages(file.getBytes(), pages);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,6 +81,38 @@ public class StorageService {
             throw new IOException("File not found on disk: " + doc.getStoredName());
         }
         return resource;
+    }
+
+    /**
+     * Reads a document's bytes from disk for in-memory processing.
+     */
+    public byte[] loadBytes(Document doc) throws IOException {
+        Resource resource = load(doc);
+        try (InputStream in = resource.getInputStream()) {
+            return in.readAllBytes();
+        }
+    }
+
+    /**
+     * Saves a processed byte array as a new Document record on disk.
+     */
+    public Document storeProcessed(byte[] bytes, String originalName, String mimeType, User owner) throws IOException {
+        String ext = "";
+        int dot = originalName.lastIndexOf('.');
+        if (dot >= 0) ext = originalName.substring(dot);
+
+        String storedName = UUID.randomUUID() + ext;
+        Path userDir = storageRoot().resolve(String.valueOf(owner.getId()));
+        Files.createDirectories(userDir);
+        Files.write(userDir.resolve(storedName), bytes);
+
+        Document doc = new Document();
+        doc.setOwner(owner);
+        doc.setOriginalName(originalName);
+        doc.setStoredName(storedName);
+        doc.setMimeType(mimeType != null ? mimeType : "application/pdf");
+        doc.setSizeBytes((long) bytes.length);
+        return documentRepository.save(doc);
     }
 
     /**

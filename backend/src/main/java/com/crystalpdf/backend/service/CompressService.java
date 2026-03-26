@@ -15,7 +15,7 @@ public class CompressService {
     private static final Set<String> VALID_LEVELS = Set.of("screen", "ebook", "printer", "prepress");
     private static final long TIMEOUT_SEC = 120;
 
-    public byte[] compress(MultipartFile file, String level) throws IOException, InterruptedException {
+    public byte[] compress(byte[] pdfBytes, String level) throws IOException, InterruptedException {
         if (!VALID_LEVELS.contains(level)) {
             throw new IllegalArgumentException("Invalid compression level: " + level);
         }
@@ -24,7 +24,7 @@ public class CompressService {
         Path tempOutput = Files.createTempFile("crystalpdf-compress-out-", ".pdf");
 
         try {
-            Files.write(tempInput, file.getBytes());
+            Files.write(tempInput, pdfBytes);
 
             ProcessBuilder pb = new ProcessBuilder(
                     "gs",
@@ -47,7 +47,6 @@ public class CompressService {
                     "Ghostscript not found. Install ghostscript and ensure it is on PATH.", e);
             }
 
-            // Drain output before waitFor to prevent buffer deadlock
             String processOutput = new String(process.getInputStream().readAllBytes());
 
             boolean finished = process.waitFor(TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -66,5 +65,9 @@ public class CompressService {
             Files.deleteIfExists(tempInput);
             Files.deleteIfExists(tempOutput);
         }
+    }
+
+    public byte[] compress(MultipartFile file, String level) throws IOException, InterruptedException {
+        return compress(file.getBytes(), level);
     }
 }
