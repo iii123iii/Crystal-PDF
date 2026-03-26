@@ -2,6 +2,8 @@ import { ArrowLeft } from 'lucide-react'
 import { tools } from '../../data/tools'
 import MergeTool from '../tools/MergeTool'
 import SplitTool from '../tools/SplitTool'
+import ProtectTool from '../tools/ProtectTool'
+import UnlockTool from '../tools/UnlockTool'
 
 interface ToolViewProps {
   toolId: string
@@ -12,6 +14,8 @@ interface ToolViewProps {
 const toolComponents: Partial<Record<string, React.ComponentType>> = {
   merge: MergeTool,
   split: SplitTool,
+  protect: ProtectTool,
+  unlock: UnlockTool,
 }
 
 export default function ToolView({ toolId, onBack }: ToolViewProps) {
