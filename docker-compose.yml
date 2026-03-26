@@ -1,0 +1,40 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: crystalpdf-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - crystalpdf-net
+    # Not exposed to host — only reachable via the frontend proxy
+    expose:
+      - "8080"
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: crystalpdf-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - crystalpdf-net
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+networks:
+  crystalpdf-net:
+    driver: bridge
