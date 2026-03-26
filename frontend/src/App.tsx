@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import WorkspacePage from './pages/WorkspacePage'
 import AuthGuard from './components/auth/AuthGuard'
 import Sidebar from './components/layout/Sidebar'
 import Header from './components/layout/Header'
@@ -25,6 +26,15 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        {/* Workspace must be declared before /* so it isn't eaten by the catch-all */}
+        <Route
+          path="/workspace/:id"
+          element={
+            <AuthGuard>
+              <WorkspacePage />
+            </AuthGuard>
+          }
+        />
         <Route
           path="/*"
           element={
@@ -33,7 +43,6 @@ export default function App() {
             </AuthGuard>
           }
         />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
       <ToastContainer />
     </BrowserRouter>

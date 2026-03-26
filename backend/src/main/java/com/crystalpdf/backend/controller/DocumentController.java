@@ -41,6 +41,17 @@ public class DocumentController {
         return ResponseEntity.ok(DocumentResponse.from(doc));
     }
 
+    /** Fetch metadata for a single document. Only the owner may access it. */
+    @GetMapping("/{id}")
+    public ResponseEntity<DocumentResponse> info(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+
+        Document doc = documentRepository.findByIdAndOwnerId(id, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found."));
+        return ResponseEntity.ok(DocumentResponse.from(doc));
+    }
+
     /** List all documents belonging to the authenticated user, newest first. */
     @GetMapping("/my-files")
     public ResponseEntity<List<DocumentResponse>> myFiles(@AuthenticationPrincipal User user) {

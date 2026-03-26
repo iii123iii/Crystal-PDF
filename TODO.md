@@ -32,9 +32,9 @@
 - [x] Implement "Open in Workspace" and "Delete" actions for history items.
 
 ## Phase 5: The Central Viewer Workspace (The Core)
-- [ ] Build the `Workspace` React component: A full-screen layout with a central PDF viewing area and a sticky tool sidebar.
-- [ ] Integrate `PDF.js` to render the *active* document in the center of the screen.
-- [ ] Implement Zustand state to track the `activeDocumentId` currently open in the viewer.
+- [x] Build the `Workspace` React component: A full-screen layout with a central PDF viewing area and a sticky tool sidebar.
+- [x] Integrate `PDF.js` to render the *active* document in the center of the screen.
+- [x] Implement Zustand state to track the `activeDocumentId` currently open in the viewer.
 
 ## Phase 6: Refactoring Tools - Operations on Active File
 - [ ] **Backend:** Refactor existing tool logic (Merge, Split, Protect) to accept a `documentId`, process it from storage, and save the output as a *new* document linked to the user.
