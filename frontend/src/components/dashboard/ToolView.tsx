@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { tools } from '../../data/tools'
 import MergeTool from '../tools/MergeTool'
+import SplitTool from '../tools/SplitTool'
 
 interface ToolViewProps {
   toolId: string
@@ -10,6 +11,7 @@ interface ToolViewProps {
 // Map of implemented tool IDs to their components
 const toolComponents: Partial<Record<string, React.ComponentType>> = {
   merge: MergeTool,
+  split: SplitTool,
 }
 
 export default function ToolView({ toolId, onBack }: ToolViewProps) {

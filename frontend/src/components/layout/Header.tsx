@@ -1,10 +1,8 @@
 import { tools } from '../../data/tools'
+import { useAppStore } from '../../store/useAppStore'
 
-interface HeaderProps {
-  activeTool: string | null
-}
-
-export default function Header({ activeTool }: HeaderProps) {
+export default function Header() {
+  const activeTool = useAppStore((s) => s.activeTool)
   const tool = tools.find((t) => t.id === activeTool)
 
   return (

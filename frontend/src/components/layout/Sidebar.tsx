@@ -1,12 +1,11 @@
 import { LayoutGrid } from 'lucide-react'
 import { tools } from '../../data/tools'
+import { useAppStore } from '../../store/useAppStore'
 
-interface SidebarProps {
-  activeTool: string | null
-  onToolSelect: (id: string | null) => void
-}
+export default function Sidebar() {
+  const activeTool = useAppStore((s) => s.activeTool)
+  const setActiveTool = useAppStore((s) => s.setActiveTool)
 
-export default function Sidebar({ activeTool, onToolSelect }: SidebarProps) {
   return (
     <aside className="w-56 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col py-4">
       <div className="px-4 mb-6">
@@ -14,9 +13,8 @@ export default function Sidebar({ activeTool, onToolSelect }: SidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-0.5 px-2">
-        {/* All Tools home */}
         <button
-          onClick={() => onToolSelect(null)}
+          onClick={() => setActiveTool(null)}
           className={`
             w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left
             ${activeTool === null
@@ -33,7 +31,7 @@ export default function Sidebar({ activeTool, onToolSelect }: SidebarProps) {
         {tools.map(({ id, icon: Icon, label, color }) => (
           <button
             key={id}
-            onClick={() => onToolSelect(id)}
+            onClick={() => setActiveTool(id)}
             className={`
               w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left
               ${activeTool === id
