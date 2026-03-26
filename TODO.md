@@ -27,9 +27,9 @@
 - [x] Create an `AuthGuard` wrapper component to protect internal dashboard routes.
 
 ## Phase 4: The Dashboard & History View
-- [ ] Build the User Dashboard UI (landing page after login).
-- [ ] Fetch and display a table/grid of the user's previously uploaded and processed files.
-- [ ] Implement "Open in Workspace" and "Delete" actions for history items.
+- [x] Build the User Dashboard UI (landing page after login).
+- [x] Fetch and display a table/grid of the user's previously uploaded and processed files.
+- [x] Implement "Open in Workspace" and "Delete" actions for history items.
 
 ## Phase 5: The Central Viewer Workspace (The Core)
 - [ ] Build the `Workspace` React component: A full-screen layout with a central PDF viewing area and a sticky tool sidebar.

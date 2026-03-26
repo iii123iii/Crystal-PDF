@@ -11,7 +11,7 @@ export default function Workspace() {
       {activeTool ? (
         <ToolView toolId={activeTool} onBack={() => setActiveTool(null)} />
       ) : (
-        <Dashboard onToolSelect={setActiveTool} />
+        <Dashboard />
       )}
     </main>
   )
