@@ -21,10 +21,10 @@
 - [x] Implement protected endpoints: `/api/documents/upload`, `/api/documents/{id}/download`, and `/api/documents/my-files`.
 
 ## Phase 3: Frontend Auth & Routing
-- [ ] Set up React Router in the frontend.
-- [ ] Create Login and Register page components with Tailwind.
-- [ ] Update Zustand store to handle JWT tokens and user session state.
-- [ ] Create an `AuthGuard` wrapper component to protect internal dashboard routes.
+- [x] Set up React Router in the frontend.
+- [x] Create Login and Register page components with Tailwind.
+- [x] Update Zustand store to handle JWT tokens and user session state.
+- [x] Create an `AuthGuard` wrapper component to protect internal dashboard routes.
 
 ## Phase 4: The Dashboard & History View
 - [ ] Build the User Dashboard UI (landing page after login).
