@@ -117,7 +117,7 @@ export default function MergeTool() {
           accept="application/pdf"
           multiple
           className="hidden"
-          onChange={(e) => addFiles(e.target.files)}
+          onChange={(e) => { addFiles(e.target.files); e.target.value = '' }}
         />
       </div>
 
