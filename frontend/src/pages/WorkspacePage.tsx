@@ -52,6 +52,8 @@ export default function WorkspacePage() {
   // Password-protected PDF state
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [wrongPassword, setWrongPassword] = useState(false)
+  // The password used to open the PDF (so tool panels can pass it to the backend)
+  const [pdfPassword, setPdfPassword] = useState<string | null>(null)
   // Preserved copy of the raw bytes — never passed directly to PDF.js so it
   // is never neutered by the worker's structured-clone transfer.
   const pdfBytesRef = useRef<ArrayBuffer | null>(null)
@@ -110,6 +112,7 @@ export default function WorkspacePage() {
       setCurrentPage(1)
       setShowPasswordModal(false)
       setWrongPassword(false)
+      setPdfPassword(password || null)
     } catch (e: unknown) {
       const pdfErr = e as { name?: string; code?: number }
       if (pdfErr?.name === 'PasswordException') {
@@ -241,28 +244,29 @@ export default function WorkspacePage() {
               selectedPages={selectedPages}
               onSelectAll={selectAll}
               onClearAll={() => setSelectedPages(new Set())}
+              pdfPassword={pdfPassword}
             />
           )}
           {activeTool === 'protect' && id && (
-            <ProtectPanel docId={id} />
+            <ProtectPanel docId={id} pdfPassword={pdfPassword} />
           )}
           {activeTool === 'compress' && id && (
-            <CompressPanel docId={id} />
+            <CompressPanel docId={id} pdfPassword={pdfPassword} />
           )}
           {activeTool === 'ocr' && id && (
-            <OcrPanel docId={id} />
+            <OcrPanel docId={id} pdfPassword={pdfPassword} />
           )}
           {activeTool === 'unlock' && id && (
-            <UnlockPanel docId={id} />
+            <UnlockPanel docId={id} pdfPassword={pdfPassword} />
           )}
           {activeTool === 'pdf-to-image' && id && (
-            <PdfToImagePanel docId={id} />
+            <PdfToImagePanel docId={id} pdfPassword={pdfPassword} />
           )}
           {activeTool === 'word-to-pdf' && id && meta && (
             <WordToPdfPanel docId={id} docName={meta.originalName} />
           )}
           {activeTool === 'merge' && id && meta && (
-            <MergePanel docId={id} docName={meta.originalName} />
+            <MergePanel docId={id} docName={meta.originalName} pdfPassword={pdfPassword} />
           )}
         </WorkspaceToolPanel>
 

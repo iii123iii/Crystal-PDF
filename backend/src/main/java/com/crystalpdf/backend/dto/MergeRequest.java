@@ -2,4 +2,4 @@ package com.crystalpdf.backend.dto;
 
 import java.util.List;
 
-public record MergeRequest(List<Long> otherDocumentIds) {}
+public record MergeRequest(List<Long> otherDocumentIds, String sourcePassword) {}

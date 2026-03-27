@@ -20,10 +20,14 @@ import com.crystalpdf.backend.service.SplitService;
 import com.crystalpdf.backend.service.StorageService;
 import com.crystalpdf.backend.service.UnlockService;
 import com.crystalpdf.backend.service.WordToPdfService;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +86,7 @@ public class WorkspaceToolController {
             @AuthenticationPrincipal User user) throws IOException {
 
         Document source = loadOwned(id, user);
-        byte[] result = splitService.extractPages(storageService.loadBytes(source), req.pages());
+        byte[] result = splitService.extractPages(prepareBytes(source, req.sourcePassword()), req.pages());
         String name = baseName(source.getOriginalName()) + "_split.pdf";
         Document out = storageService.storeProcessed(result, name, "application/pdf", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
@@ -96,7 +100,7 @@ public class WorkspaceToolController {
 
         Document source = loadOwned(id, user);
         byte[] result = protectService.protect(
-                storageService.loadBytes(source), req.userPassword(), req.ownerPassword());
+                prepareBytes(source, req.sourcePassword()), req.userPassword(), req.ownerPassword());
         String name = baseName(source.getOriginalName()) + "_protected.pdf";
         Document out = storageService.storeProcessed(result, name, "application/pdf", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
@@ -110,7 +114,7 @@ public class WorkspaceToolController {
 
         Document source = loadOwned(id, user);
         String level = (req.level() != null && !req.level().isBlank()) ? req.level() : "ebook";
-        byte[] result = compressService.compress(storageService.loadBytes(source), level);
+        byte[] result = compressService.compress(prepareBytes(source, req.sourcePassword()), level);
         String name = baseName(source.getOriginalName()) + "_compressed.pdf";
         Document out = storageService.storeProcessed(result, name, "application/pdf", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
@@ -124,7 +128,7 @@ public class WorkspaceToolController {
 
         Document source = loadOwned(id, user);
         String lang = (req.language() != null && !req.language().isBlank()) ? req.language() : "eng";
-        byte[] result = ocrService.ocr(storageService.loadBytes(source), lang);
+        byte[] result = ocrService.ocr(prepareBytes(source, req.sourcePassword()), lang);
         String name = baseName(source.getOriginalName()) + "_ocr.pdf";
         Document out = storageService.storeProcessed(result, name, "application/pdf", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
@@ -137,6 +141,7 @@ public class WorkspaceToolController {
             @AuthenticationPrincipal User user) throws IOException {
 
         Document source = loadOwned(id, user);
+        // For unlock, req.password() IS the open password — pass it directly to UnlockService
         byte[] result = unlockService.unlock(storageService.loadBytes(source), req.password());
         String name = baseName(source.getOriginalName()) + "_unlocked.pdf";
         Document out = storageService.storeProcessed(result, name, "application/pdf", user);
@@ -152,7 +157,7 @@ public class WorkspaceToolController {
         Document source = loadOwned(id, user);
         String format = (req.format() != null && !req.format().isBlank()) ? req.format() : "png";
         int dpi = (req.dpi() != null && req.dpi() >= 72 && req.dpi() <= 300) ? req.dpi() : 150;
-        byte[] result = pdfToImageService.convert(storageService.loadBytes(source), format, dpi);
+        byte[] result = pdfToImageService.convert(prepareBytes(source, req.sourcePassword()), format, dpi);
         String name = baseName(source.getOriginalName()) + "_images.zip";
         Document out = storageService.storeProcessed(result, name, "application/zip", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
@@ -183,7 +188,7 @@ public class WorkspaceToolController {
 
         Document primary = loadOwned(id, user);
         List<byte[]> allBytes = new ArrayList<>();
-        allBytes.add(storageService.loadBytes(primary));
+        allBytes.add(prepareBytes(primary, req.sourcePassword()));
 
         for (Long otherId : req.otherDocumentIds()) {
             Document other = documentRepository.findByIdAndOwnerId(otherId, user.getId())
@@ -198,6 +203,29 @@ public class WorkspaceToolController {
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Load the document bytes and, if the PDF is encrypted, transparently
+     * decrypt it using the provided sourcePassword before handing it to any
+     * processing service.  Non-encrypted PDFs are returned as-is.
+     */
+    private byte[] prepareBytes(Document source, String sourcePassword) throws IOException {
+        byte[] bytes = storageService.loadBytes(source);
+        String pw = sourcePassword != null ? sourcePassword : "";
+        try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(bytes.clone()), pw)) {
+            if (!doc.isEncrypted()) {
+                return bytes;
+            }
+            doc.setAllSecurityToBeRemoved(true);
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                doc.save(bos);
+                return bos.toByteArray();
+            }
+        } catch (org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException e) {
+            throw new IllegalArgumentException(
+                "This PDF is password-protected. Provide the correct open password.");
+        }
+    }
 
     private Document loadOwned(Long id, User user) {
         return documentRepository.findByIdAndOwnerId(id, user.getId())

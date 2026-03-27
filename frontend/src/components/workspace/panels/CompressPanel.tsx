@@ -6,6 +6,7 @@ import { useToastStore } from '../../../store/useToastStore'
 
 interface CompressPanelProps {
   docId: string
+  pdfPassword?: string | null
 }
 
 type Level = 'screen' | 'ebook' | 'printer' | 'prepress'
@@ -20,7 +21,7 @@ const LEVELS: { value: Level; label: string; desc: string }[] = [
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function CompressPanel({ docId }: CompressPanelProps) {
+export default function CompressPanel({ docId, pdfPassword }: CompressPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [level, setLevel] = useState<Level>('ebook')
@@ -35,7 +36,7 @@ export default function CompressPanel({ docId }: CompressPanelProps) {
       const res = await apiFetch(`/api/documents/${docId}/tools/compress`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level }),
+        body: JSON.stringify({ level, sourcePassword: pdfPassword ?? null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

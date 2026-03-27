@@ -6,6 +6,7 @@ import { useToastStore } from '../../../store/useToastStore'
 
 interface OcrPanelProps {
   docId: string
+  pdfPassword?: string | null
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -25,7 +26,7 @@ const LANGUAGES = [
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function OcrPanel({ docId }: OcrPanelProps) {
+export default function OcrPanel({ docId, pdfPassword }: OcrPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [language, setLanguage] = useState('eng')
@@ -40,7 +41,7 @@ export default function OcrPanel({ docId }: OcrPanelProps) {
       const res = await apiFetch(`/api/documents/${docId}/tools/ocr`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language }),
+        body: JSON.stringify({ language, sourcePassword: pdfPassword ?? null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

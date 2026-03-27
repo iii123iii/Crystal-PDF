@@ -10,6 +10,7 @@ interface SplitPanelProps {
   selectedPages: Set<number>
   onSelectAll: () => void
   onClearAll: () => void
+  pdfPassword?: string | null
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -19,7 +20,7 @@ interface ResultDoc {
   originalName: string
 }
 
-export default function SplitPanel({ docId, totalPages, selectedPages, onSelectAll, onClearAll }: SplitPanelProps) {
+export default function SplitPanel({ docId, totalPages, selectedPages, onSelectAll, onClearAll, pdfPassword }: SplitPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [status, setStatus] = useState<Status>('idle')
@@ -36,7 +37,7 @@ export default function SplitPanel({ docId, totalPages, selectedPages, onSelectA
       const res = await apiFetch(`/api/documents/${docId}/tools/split`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pages: Array.from(selectedPages).sort((a, b) => a - b) }),
+        body: JSON.stringify({ pages: Array.from(selectedPages).sort((a, b) => a - b), sourcePassword: pdfPassword ?? null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

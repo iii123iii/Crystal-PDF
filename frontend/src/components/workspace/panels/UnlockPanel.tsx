@@ -6,15 +6,17 @@ import { useToastStore } from '../../../store/useToastStore'
 
 interface UnlockPanelProps {
   docId: string
+  pdfPassword?: string | null
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
 interface ResultDoc { id: number; originalName: string }
 
-export default function UnlockPanel({ docId }: UnlockPanelProps) {
+export default function UnlockPanel({ docId, pdfPassword }: UnlockPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
-  const [password, setPassword] = useState('')
+  // Pre-fill with the password used to open the PDF (if any)
+  const [password, setPassword] = useState(pdfPassword ?? '')
   const [showPw, setShowPw] = useState(false)
   const [status, setStatus] = useState<Status>('idle')
   const [result, setResult] = useState<ResultDoc | null>(null)

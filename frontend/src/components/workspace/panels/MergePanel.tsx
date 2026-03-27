@@ -7,6 +7,7 @@ import { useToastStore } from '../../../store/useToastStore'
 interface MergePanelProps {
   docId: string
   docName: string
+  pdfPassword?: string | null
 }
 
 interface DocItem {
@@ -24,7 +25,7 @@ function fmtSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export default function MergePanel({ docId, docName }: MergePanelProps) {
+export default function MergePanel({ docId, docName, pdfPassword }: MergePanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [docs, setDocs] = useState<DocItem[]>([])
@@ -62,7 +63,7 @@ export default function MergePanel({ docId, docName }: MergePanelProps) {
       const res = await apiFetch(`/api/documents/${docId}/tools/merge`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ otherDocumentIds: Array.from(selected) }),
+        body: JSON.stringify({ otherDocumentIds: Array.from(selected), sourcePassword: pdfPassword ?? null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

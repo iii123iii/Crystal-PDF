@@ -6,13 +6,14 @@ import { useToastStore } from '../../../store/useToastStore'
 
 interface ProtectPanelProps {
   docId: string
+  pdfPassword?: string | null
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function ProtectPanel({ docId }: ProtectPanelProps) {
+export default function ProtectPanel({ docId, pdfPassword }: ProtectPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [userPw, setUserPw] = useState('')
@@ -32,7 +33,7 @@ export default function ProtectPanel({ docId }: ProtectPanelProps) {
       const res = await apiFetch(`/api/documents/${docId}/tools/protect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userPassword: userPw, ownerPassword: showOwner ? ownerPw : null }),
+        body: JSON.stringify({ userPassword: userPw, ownerPassword: showOwner ? ownerPw : null, sourcePassword: pdfPassword ?? null }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
