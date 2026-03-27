@@ -52,7 +52,9 @@ export default function WorkspacePage() {
   // Password-protected PDF state
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [wrongPassword, setWrongPassword] = useState(false)
-  const pdfBufferRef = useRef<ArrayBuffer | null>(null)
+  // Preserved copy of the raw bytes — never passed directly to PDF.js so it
+  // is never neutered by the worker's structured-clone transfer.
+  const pdfBytesRef = useRef<ArrayBuffer | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -85,8 +87,11 @@ export default function WorkspacePage() {
       ])
 
       setMeta(docMeta)
-      pdfBufferRef.current = buffer
-      await openPdf(buffer, '')
+      // Store an independent copy BEFORE calling PDF.js — getDocument transfers
+      // the ArrayBuffer to the worker, neutering the original (byteLength → 0).
+      // We slice(0) again on every attempt so retries always get a fresh buffer.
+      pdfBytesRef.current = buffer.slice(0)
+      await openPdf('')
     } catch {
       setError('Failed to load the document. Is the backend running?')
       addToast('error', 'Could not open document.')
@@ -95,9 +100,12 @@ export default function WorkspacePage() {
     }
   }
 
-  async function openPdf(buffer: ArrayBuffer, password: string) {
+  async function openPdf(password: string) {
+    const stored = pdfBytesRef.current
+    if (!stored) return
     try {
-      const doc = await pdfjsLib.getDocument({ data: buffer, password }).promise
+      // slice(0) creates a fresh transferable copy; the stored ref stays intact
+      const doc = await pdfjsLib.getDocument({ data: stored.slice(0), password }).promise
       setPdfDoc(doc)
       setCurrentPage(1)
       setShowPasswordModal(false)
@@ -116,9 +124,7 @@ export default function WorkspacePage() {
   }
 
   function handlePasswordSubmit(password: string) {
-    const buf = pdfBufferRef.current
-    if (!buf) return
-    openPdf(buf, password)
+    openPdf(password)
   }
 
   function handlePasswordCancel() {

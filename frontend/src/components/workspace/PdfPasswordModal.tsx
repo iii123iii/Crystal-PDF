@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Lock, Eye, EyeOff, X } from 'lucide-react'
+import { Lock, Eye, EyeOff, X, ArrowLeft } from 'lucide-react'
 
 interface PdfPasswordModalProps {
   open: boolean
@@ -43,7 +43,16 @@ export default function PdfPasswordModal({ open, wrongPassword, onSubmit, onCanc
           boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset',
         }}
       >
-        {/* Close button */}
+        {/* Back to dashboard — top left */}
+        <button
+          onClick={onCancel}
+          className="absolute top-3.5 left-4 flex items-center gap-1.5 text-slate-600 hover:text-slate-300 transition-colors"
+        >
+          <ArrowLeft size={13} />
+          <span className="text-xs">Dashboard</span>
+        </button>
+
+        {/* Close button — top right */}
         <button
           onClick={onCancel}
           className="absolute top-3.5 right-3.5 w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-white/[0.06] transition-colors"
