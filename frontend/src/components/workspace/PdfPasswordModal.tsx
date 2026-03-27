@@ -17,7 +17,6 @@ export default function PdfPasswordModal({ open, wrongPassword, onSubmit, onCanc
     if (open) {
       setPassword('')
       setShow(false)
-      // Small delay so the transition finishes before focusing
       setTimeout(() => inputRef.current?.focus(), 80)
     }
   }, [open])
@@ -36,23 +35,26 @@ export default function PdfPasswordModal({ open, wrongPassword, onSubmit, onCanc
       onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}
     >
       <div
-        className="relative w-full max-w-sm mx-4 rounded-2xl overflow-hidden"
+        className="w-full max-w-sm mx-4 rounded-2xl overflow-hidden"
         style={{
           background: 'linear-gradient(160deg, #0d1e35 0%, #0a1628 100%)',
           border: '1px solid rgba(255,255,255,0.08)',
           boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset',
         }}
       >
-        {/* Back arrow — icon only, top left */}
-        <button
-          onClick={onCancel}
-          title="Back to dashboard"
-          className="absolute top-4 left-4 w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-white/[0.06] transition-colors"
-        >
-          <ArrowLeft size={15} />
-        </button>
+        {/* Back button row */}
+        <div className="px-4 pt-4">
+          <button
+            onClick={onCancel}
+            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-300 transition-colors group"
+          >
+            <ArrowLeft size={13} className="transition-transform group-hover:-translate-x-0.5" />
+            <span className="text-xs">Dashboard</span>
+          </button>
+        </div>
 
-        <div className="px-7 pt-7 pb-7">
+        {/* Content */}
+        <div className="px-7 pt-5 pb-7">
           {/* Icon */}
           <div
             className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
