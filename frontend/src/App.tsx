@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import WorkspacePage from './pages/WorkspacePage'
+import LandingPage from './pages/LandingPage'
 import AuthGuard from './components/auth/AuthGuard'
 import Sidebar from './components/layout/Sidebar'
 import Workspace from './components/layout/Workspace'
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         {/* Workspace must be declared before /* so it isn't eaten by the catch-all */}
