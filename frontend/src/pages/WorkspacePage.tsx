@@ -15,6 +15,7 @@ import OcrPanel from '../components/workspace/panels/OcrPanel'
 import UnlockPanel from '../components/workspace/panels/UnlockPanel'
 import PdfToImagePanel from '../components/workspace/panels/PdfToImagePanel'
 import WordToPdfPanel from '../components/workspace/panels/WordToPdfPanel'
+import ImageToPdfPanel from '../components/workspace/panels/ImageToPdfPanel'
 import MergePanel from '../components/workspace/panels/MergePanel'
 import { useToastStore } from '../store/useToastStore'
 
@@ -264,6 +265,9 @@ export default function WorkspacePage() {
           )}
           {activeTool === 'word-to-pdf' && id && meta && (
             <WordToPdfPanel docId={id} docName={meta.originalName} />
+          )}
+          {activeTool === 'image-to-pdf' && id && (
+            <ImageToPdfPanel docId={id} />
           )}
           {activeTool === 'merge' && id && meta && (
             <MergePanel docId={id} docName={meta.originalName} pdfPassword={pdfPassword} />

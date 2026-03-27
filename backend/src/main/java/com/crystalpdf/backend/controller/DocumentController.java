@@ -1,9 +1,11 @@
 package com.crystalpdf.backend.controller;
 
 import com.crystalpdf.backend.dto.DocumentResponse;
+import com.crystalpdf.backend.dto.RenameRequest;
 import com.crystalpdf.backend.entity.Document;
 import com.crystalpdf.backend.entity.User;
 import com.crystalpdf.backend.repository.DocumentRepository;
+import com.crystalpdf.backend.service.ImageToPdfService;
 import com.crystalpdf.backend.service.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -22,10 +24,14 @@ public class DocumentController {
 
     private final StorageService storageService;
     private final DocumentRepository documentRepository;
+    private final ImageToPdfService imageToPdfService;
 
-    public DocumentController(StorageService storageService, DocumentRepository documentRepository) {
+    public DocumentController(StorageService storageService,
+                               DocumentRepository documentRepository,
+                               ImageToPdfService imageToPdfService) {
         this.storageService = storageService;
         this.documentRepository = documentRepository;
+        this.imageToPdfService = imageToPdfService;
     }
 
     /** Upload a file — creates a Document record and saves to disk. */
@@ -93,5 +99,33 @@ public class DocumentController {
         storageService.deleteFile(doc);
         documentRepository.delete(doc);
         return ResponseEntity.noContent().build();
+    }
+
+    /** Rename a document (only the originalName display label, not the file on disk). */
+    @PatchMapping("/{id}/rename")
+    public ResponseEntity<DocumentResponse> rename(
+            @PathVariable Long id,
+            @RequestBody RenameRequest req,
+            @AuthenticationPrincipal User user) {
+
+        if (req.name() == null || req.name().isBlank()) {
+            throw new IllegalArgumentException("Name must not be empty.");
+        }
+        Document doc = documentRepository.findByIdAndOwnerId(id, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found."));
+        doc.setOriginalName(req.name().trim());
+        documentRepository.save(doc);
+        return ResponseEntity.ok(DocumentResponse.from(doc));
+    }
+
+    /** Convert uploaded images to a PDF and save to the user's library. */
+    @PostMapping("/image-to-pdf")
+    public ResponseEntity<DocumentResponse> imageToPdf(
+            @RequestParam("files") List<MultipartFile> files,
+            @AuthenticationPrincipal User user) throws IOException {
+
+        byte[] result = imageToPdfService.convert(files);
+        Document doc = storageService.storeProcessed(result, "images.pdf", "application/pdf", user);
+        return ResponseEntity.ok(DocumentResponse.from(doc));
     }
 }

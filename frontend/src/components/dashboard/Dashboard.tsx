@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Trash2, ExternalLink, UploadCloud, Loader2, Download, FolderOpen } from 'lucide-react'
+import { FileText, Trash2, ExternalLink, UploadCloud, Loader2, Download, FolderOpen, Search, Pencil, Check, X } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 import { useAppStore } from '../../store/useAppStore'
 import { useToastStore } from '../../store/useToastStore'
@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const addToast = useToastStore((s) => s.addToast)
@@ -119,10 +120,31 @@ export default function Dashboard() {
     }
   }
 
+  async function handleRename(id: number, newName: string) {
+    try {
+      const res = await apiFetch(`/api/documents/${id}/rename`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName }),
+      })
+      if (res.ok) {
+        const updated = await res.json() as DocumentInfo
+        setFiles((prev) => prev.map((f) => f.id === id ? { ...f, originalName: updated.originalName } : f))
+      } else {
+        addToast('error', 'Rename failed.')
+      }
+    } catch {
+      addToast('error', 'Rename failed.')
+    }
+  }
+
   const firstName = userEmail?.split('@')[0] ?? 'there'
+  const filtered = query.trim()
+    ? files.filter((f) => f.originalName.toLowerCase().includes(query.toLowerCase()))
+    : files
 
   return (
-    <div className="max-w-6xl mx-auto w-full space-y-8">
+    <div className="max-w-6xl mx-auto w-full space-y-8 px-8 py-10">
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -181,13 +203,30 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Divider */}
+      {/* Search + file list */}
       {!loading && files.length > 0 && (
-        <div className="flex items-center gap-4">
-          <div className="h-px flex-1 bg-slate-800" />
-          <span className="text-xs text-slate-600 uppercase tracking-wider">Recent files</span>
-          <div className="h-px flex-1 bg-slate-800" />
-        </div>
+        <>
+          {/* Search bar */}
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search files…"
+              className="w-full pl-9 pr-4 py-2 rounded-lg text-sm text-slate-300 placeholder-slate-600 outline-none transition-colors"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-slate-800" />
+            <span className="text-xs text-slate-600 uppercase tracking-wider">
+              {query ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''}` : 'Recent files'}
+            </span>
+            <div className="h-px flex-1 bg-slate-800" />
+          </div>
+        </>
       )}
 
       {/* Content */}
@@ -195,9 +234,14 @@ export default function Dashboard() {
         <LoadingSkeleton />
       ) : files.length === 0 ? (
         <EmptyState />
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Search size={28} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">No files match "{query}"</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {files.map((file) => (
+          {filtered.map((file) => (
             <FileCard
               key={file.id}
               file={file}
@@ -205,6 +249,7 @@ export default function Dashboard() {
               onDelete={() => handleDelete(file.id, file.originalName)}
               onDownload={() => handleDownload(file.id, file.originalName)}
               onOpen={() => navigate(`/workspace/${file.id}`)}
+              onRename={(name) => handleRename(file.id, name)}
             />
           ))}
         </div>
@@ -221,10 +266,33 @@ interface FileCardProps {
   onDelete: () => void
   onDownload: () => void
   onOpen: () => void
+  onRename: (name: string) => void
 }
 
-function FileCard({ file, deleting, onDelete, onDownload, onOpen }: FileCardProps) {
+function FileCard({ file, deleting, onDelete, onDownload, onOpen, onRename }: FileCardProps) {
   const ext = file.originalName.split('.').pop()?.toUpperCase() ?? 'FILE'
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(file.originalName)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function startEdit() {
+    setDraft(file.originalName)
+    setEditing(true)
+    setTimeout(() => inputRef.current?.select(), 30)
+  }
+
+  function commitRename() {
+    const trimmed = draft.trim()
+    if (trimmed && trimmed !== file.originalName) {
+      onRename(trimmed)
+    }
+    setEditing(false)
+  }
+
+  function cancelRename() {
+    setDraft(file.originalName)
+    setEditing(false)
+  }
 
   return (
     <div className="group flex flex-col bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-slate-600/60 hover:bg-slate-800/60 transition-colors">
@@ -236,9 +304,40 @@ function FileCard({ file, deleting, onDelete, onDownload, onOpen }: FileCardProp
           <span className="text-red-400/70 text-[9px] font-bold leading-none mt-0.5">{ext}</span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-white font-medium truncate leading-snug" title={file.originalName}>
-            {file.originalName}
-          </p>
+          {editing ? (
+            <div className="flex items-center gap-1">
+              <input
+                ref={inputRef}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitRename()
+                  if (e.key === 'Escape') cancelRename()
+                }}
+                className="flex-1 min-w-0 text-sm text-white bg-transparent outline-none border-b border-blue-400/60 pb-0.5"
+                autoFocus
+              />
+              <button onClick={commitRename} className="shrink-0 text-green-400 hover:text-green-300 transition-colors">
+                <Check size={13} />
+              </button>
+              <button onClick={cancelRename} className="shrink-0 text-slate-500 hover:text-slate-300 transition-colors">
+                <X size={13} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 min-w-0">
+              <p className="text-sm text-white font-medium truncate leading-snug flex-1 min-w-0" title={file.originalName}>
+                {file.originalName}
+              </p>
+              <button
+                onClick={startEdit}
+                className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-600 hover:text-slate-300 transition-all"
+                title="Rename"
+              >
+                <Pencil size={11} />
+              </button>
+            </div>
+          )}
           <p className="text-xs text-slate-500 mt-0.5">
             {formatBytes(file.sizeBytes)}
           </p>

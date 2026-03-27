@@ -2,11 +2,14 @@ package com.crystalpdf.backend.controller;
 
 import com.crystalpdf.backend.dto.AuthRequest;
 import com.crystalpdf.backend.dto.AuthResponse;
+import com.crystalpdf.backend.dto.ChangePasswordRequest;
+import com.crystalpdf.backend.entity.User;
 import com.crystalpdf.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,5 +37,13 @@ public class AuthController {
         );
         String token = authService.login(req.email());
         return ResponseEntity.ok(new AuthResponse(token));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @RequestBody ChangePasswordRequest req,
+            @AuthenticationPrincipal User user) {
+        authService.changePassword(user, req.currentPassword(), req.newPassword());
+        return ResponseEntity.noContent().build();
     }
 }
