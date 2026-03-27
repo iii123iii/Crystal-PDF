@@ -17,6 +17,10 @@ import PdfToImagePanel from '../components/workspace/panels/PdfToImagePanel'
 import WordToPdfPanel from '../components/workspace/panels/WordToPdfPanel'
 import ImageToPdfPanel from '../components/workspace/panels/ImageToPdfPanel'
 import MergePanel from '../components/workspace/panels/MergePanel'
+import AnnotatePanel from '../components/workspace/panels/AnnotatePanel'
+import FloatingAnnotateBar from '../components/workspace/annotation/FloatingAnnotateBar'
+import { useAnnotations } from '../components/workspace/annotation/useAnnotations'
+import type { AnnotationTool } from '../components/workspace/annotation/useAnnotations'
 import { useToastStore } from '../store/useToastStore'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
@@ -49,6 +53,12 @@ export default function WorkspacePage() {
 
   // Page thumbnail strip
   const [showPages, setShowPages] = useState(false)
+
+  // Annotation state
+  const annotations = useAnnotations()
+  const [annotateTool, setAnnotateTool] = useState<AnnotationTool>('pen')
+  const [annotateColor, setAnnotateColor] = useState('#e2e8f0')
+  const [annotateStrokeWidth, setAnnotateStrokeWidth] = useState(4)
 
   // Password-protected PDF state
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -272,6 +282,9 @@ export default function WorkspacePage() {
           {activeTool === 'merge' && id && meta && (
             <MergePanel docId={id} docName={meta.originalName} pdfPassword={pdfPassword} />
           )}
+          {activeTool === 'annotate' && (
+            <AnnotatePanel />
+          )}
         </WorkspaceToolPanel>
 
         {/* PDF viewer + thumbnail strip side by side */}
@@ -298,14 +311,40 @@ export default function WorkspacePage() {
                 </button>
               </div>
             ) : pdfDoc ? (
-              <PdfViewer
-                pdfDoc={pdfDoc}
-                scale={scale}
-                onPageChange={setCurrentPage}
-                selectionMode={isSelectionMode}
-                selectedPages={selectedPages}
-                onPageClick={togglePage}
-              />
+              <>
+                {/* Floating annotation toolbar */}
+                {activeTool === 'annotate' && (
+                  <FloatingAnnotateBar
+                    tool={annotateTool}
+                    onToolChange={setAnnotateTool}
+                    color={annotateColor}
+                    onColorChange={setAnnotateColor}
+                    strokeWidth={annotateStrokeWidth}
+                    onStrokeWidthChange={setAnnotateStrokeWidth}
+                    onUndo={() => annotations.undo(currentPage)}
+                    onClearPage={() => annotations.clearPage(currentPage)}
+                  />
+                )}
+                <PdfViewer
+                  pdfDoc={pdfDoc}
+                  scale={scale}
+                  onPageChange={setCurrentPage}
+                  selectionMode={isSelectionMode}
+                  selectedPages={selectedPages}
+                  onPageClick={togglePage}
+                  annotationHandlers={activeTool === 'annotate' ? {
+                    tool: annotateTool,
+                    color: annotateColor,
+                    strokeWidth: annotateStrokeWidth,
+                    getPageAnnotations: annotations.getPage,
+                    onStrokeComplete: annotations.addStroke,
+                    onErase: annotations.eraseAt,
+                    onTextAdd: annotations.addText,
+                    onTextUpdate: annotations.updateText,
+                    onTextDelete: annotations.deleteText,
+                  } : undefined}
+                />
+              </>
             ) : null}
           </div>
 

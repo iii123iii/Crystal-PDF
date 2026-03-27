@@ -1,8 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import { Check } from 'lucide-react'
+import type { AnnotationTool, DrawStroke, PageAnnotations, TextAnnotation } from './annotation/useAnnotations'
+import AnnotationCanvas from './annotation/AnnotationCanvas'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
+
+export interface AnnotationHandlers {
+  tool: AnnotationTool
+  color: string
+  strokeWidth: number
+  getPageAnnotations: (n: number) => PageAnnotations
+  onStrokeComplete: (page: number, stroke: DrawStroke) => void
+  onErase: (page: number, x: number, y: number, radius: number) => void
+  onTextAdd: (page: number, text: TextAnnotation) => void
+  onTextUpdate: (page: number, id: string, updates: Partial<TextAnnotation>) => void
+  onTextDelete: (page: number, id: string) => void
+}
 
 interface PdfViewerProps {
   pdfDoc: pdfjsLib.PDFDocumentProxy
@@ -11,6 +25,7 @@ interface PdfViewerProps {
   selectionMode?: boolean
   selectedPages?: Set<number>
   onPageClick?: (n: number) => void
+  annotationHandlers?: AnnotationHandlers
 }
 
 export function PdfViewer({
@@ -20,6 +35,7 @@ export function PdfViewer({
   selectionMode = false,
   selectedPages,
   onPageClick,
+  annotationHandlers,
 }: PdfViewerProps) {
   const pages = Array.from({ length: pdfDoc.numPages }, (_, i) => i + 1)
 
@@ -35,6 +51,7 @@ export function PdfViewer({
           selectionMode={selectionMode}
           selected={selectedPages?.has(n) ?? false}
           onPageClick={onPageClick}
+          annotationHandlers={annotationHandlers}
         />
       ))}
     </div>
@@ -51,12 +68,14 @@ interface PdfPageProps {
   selectionMode: boolean
   selected: boolean
   onPageClick?: (n: number) => void
+  annotationHandlers?: AnnotationHandlers
 }
 
-function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, onPageClick }: PdfPageProps) {
+function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, onPageClick, annotationHandlers }: PdfPageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const [rendered, setRendered] = useState(false)
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -70,7 +89,10 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
       canvas.height = Math.floor(viewport.height)
       const ctx = canvas.getContext('2d')!
       await page.render({ canvasContext: ctx, viewport, canvas }).promise
-      if (!cancelled) setRendered(true)
+      if (!cancelled) {
+        setRendered(true)
+        setDims({ w: Math.floor(viewport.width), h: Math.floor(viewport.height) })
+      }
     })()
     return () => { cancelled = true }
   }, [pdfDoc, pageNum, scale])
@@ -87,6 +109,8 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
     return () => obs.disconnect()
   }, [pageNum, stableOnVisible])
 
+  const ah = annotationHandlers
+
   return (
     <div id={`page-${pageNum}`} ref={wrapRef} className="mb-5 relative">
       {!rendered && (
@@ -100,6 +124,26 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
       />
       {rendered && (
         <p className="text-center text-xs text-slate-600 mt-2 select-none">{pageNum}</p>
+      )}
+
+      {/* ── Annotation canvas overlay ── */}
+      {rendered && dims && ah && (
+        <div style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'auto' }}>
+          <AnnotationCanvas
+            pageNum={pageNum}
+            canvasWidth={dims.w}
+            canvasHeight={dims.h}
+            tool={ah.tool}
+            color={ah.color}
+            strokeWidth={ah.strokeWidth}
+            annotations={ah.getPageAnnotations(pageNum)}
+            onStrokeComplete={(stroke) => ah.onStrokeComplete(pageNum, stroke)}
+            onErase={(x, y, r) => ah.onErase(pageNum, x, y, r)}
+            onTextAdd={(text) => ah.onTextAdd(pageNum, text)}
+            onTextUpdate={(id, updates) => ah.onTextUpdate(pageNum, id, updates)}
+            onTextDelete={(id) => ah.onTextDelete(pageNum, id)}
+          />
+        </div>
       )}
 
       {/* ── Selection overlay ── */}

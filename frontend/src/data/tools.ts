@@ -8,6 +8,7 @@ import {
   FileText,
   Lock,
   Unlock,
+  PenLine,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -92,5 +93,13 @@ export const tools: Tool[] = [
     icon: Unlock,
     color: 'text-yellow-400',
     borderHover: 'hover:border-yellow-500',
+  },
+  {
+    id: 'annotate',
+    label: 'Annotate',
+    description: 'Draw, highlight, and add text annotations directly on the PDF.',
+    icon: PenLine,
+    color: 'text-sky-400',
+    borderHover: 'hover:border-sky-500',
   },
 ]
