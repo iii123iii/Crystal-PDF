@@ -1,18 +1,15 @@
-import { useAppStore } from '../../store/useAppStore'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from '../dashboard/Dashboard'
-import ToolView from '../dashboard/ToolView'
+import SettingsView from './SettingsView'
 
 export default function Workspace() {
-  const activeTool = useAppStore((s) => s.activeTool)
-  const setActiveTool = useAppStore((s) => s.setActiveTool)
-
   return (
-    <main className="flex-1 overflow-auto p-8">
-      {activeTool ? (
-        <ToolView toolId={activeTool} onBack={() => setActiveTool(null)} />
-      ) : (
-        <Dashboard />
-      )}
+    <main className="flex-1 overflow-auto" style={{ background: '#0b1422' }}>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/settings" element={<SettingsView />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </main>
   )
 }
