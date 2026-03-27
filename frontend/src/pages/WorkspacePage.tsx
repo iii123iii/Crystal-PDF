@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as pdfjsLib from 'pdfjs-dist'
 import { ArrowLeft, ZoomIn, ZoomOut, Loader2, AlertCircle, LayoutGrid } from 'lucide-react'
@@ -7,6 +7,7 @@ import { PdfViewer } from '../components/workspace/PdfViewer'
 import WorkspaceToolSidebar from '../components/workspace/WorkspaceToolSidebar'
 import WorkspaceToolPanel from '../components/workspace/WorkspaceToolPanel'
 import PageThumbnailStrip from '../components/workspace/PageThumbnailStrip'
+import PdfPasswordModal from '../components/workspace/PdfPasswordModal'
 import SplitPanel from '../components/workspace/panels/SplitPanel'
 import ProtectPanel from '../components/workspace/panels/ProtectPanel'
 import CompressPanel from '../components/workspace/panels/CompressPanel'
@@ -48,6 +49,11 @@ export default function WorkspacePage() {
   // Page thumbnail strip
   const [showPages, setShowPages] = useState(false)
 
+  // Password-protected PDF state
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [wrongPassword, setWrongPassword] = useState(false)
+  const pdfBufferRef = useRef<ArrayBuffer | null>(null)
+
   useEffect(() => {
     if (!id) return
     loadDocument(id)
@@ -61,6 +67,7 @@ export default function WorkspacePage() {
   async function loadDocument(docId: string) {
     setLoading(true)
     setError(null)
+    setPdfDoc(null)
     try {
       const [metaRes, fileRes] = await Promise.all([
         apiFetch(`/api/documents/${docId}`),
@@ -78,15 +85,46 @@ export default function WorkspacePage() {
       ])
 
       setMeta(docMeta)
-      const doc = await pdfjsLib.getDocument({ data: buffer }).promise
-      setPdfDoc(doc)
-      setCurrentPage(1)
+      pdfBufferRef.current = buffer
+      await openPdf(buffer, '')
     } catch {
       setError('Failed to load the document. Is the backend running?')
       addToast('error', 'Could not open document.')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function openPdf(buffer: ArrayBuffer, password: string) {
+    try {
+      const doc = await pdfjsLib.getDocument({ data: buffer, password }).promise
+      setPdfDoc(doc)
+      setCurrentPage(1)
+      setShowPasswordModal(false)
+      setWrongPassword(false)
+    } catch (e: unknown) {
+      const pdfErr = e as { name?: string; code?: number }
+      if (pdfErr?.name === 'PasswordException') {
+        // code 1 = NEED_PASSWORD, code 2 = INCORRECT_PASSWORD
+        setWrongPassword(pdfErr.code === 2)
+        setShowPasswordModal(true)
+      } else {
+        setError('Failed to render the document.')
+        addToast('error', 'Could not open document.')
+      }
+    }
+  }
+
+  function handlePasswordSubmit(password: string) {
+    const buf = pdfBufferRef.current
+    if (!buf) return
+    openPdf(buf, password)
+  }
+
+  function handlePasswordCancel() {
+    setShowPasswordModal(false)
+    setWrongPassword(false)
+    navigate('/dashboard')
   }
 
   function togglePage(n: number) {
@@ -108,6 +146,14 @@ export default function WorkspacePage() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#0a1520' }}>
+
+      {/* ── Password modal ───────────────────────────────────────────────────── */}
+      <PdfPasswordModal
+        open={showPasswordModal}
+        wrongPassword={wrongPassword}
+        onSubmit={handlePasswordSubmit}
+        onCancel={handlePasswordCancel}
+      />
 
       {/* ── Top bar ──────────────────────────────────────────────────────────── */}
       <header

@@ -34,6 +34,9 @@ services:
       - DB_URL=jdbc:postgresql://postgres:5432/crystalpdf
       - DB_USERNAME=crystalpdf
       - DB_PASSWORD=crystalpdf_secure_password
+      - STORAGE_PATH=/app/storage
+    volumes:
+      - crystalpdf-storage:/app/storage
     networks:
       - crystalpdf-net
     # Not exposed to host — only reachable via the frontend proxy
@@ -67,3 +70,4 @@ networks:
 
 volumes:
   crystalpdf-db:
+  crystalpdf-storage:
