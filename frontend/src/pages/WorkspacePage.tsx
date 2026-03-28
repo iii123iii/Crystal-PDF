@@ -38,6 +38,7 @@ import { useToastStore } from '../store/useToastStore'
 import { VisualOrganizer } from '../components/workspace/VisualOrganizer'
 import RedactOverlay from '../components/workspace/overlays/RedactOverlay'
 import type { RedactArea } from '../components/workspace/overlays/RedactOverlay'
+import RedactPreviewOverlay from '../components/workspace/overlays/RedactPreviewOverlay'
 import WatermarkOverlay from '../components/workspace/overlays/WatermarkOverlay'
 import CropOverlay from '../components/workspace/overlays/CropOverlay'
 
@@ -135,7 +136,6 @@ export default function WorkspacePage() {
 
   useEffect(() => {
     setSelectedPages(new Set())
-    if (activeTool !== 'redact') setRedactAreas([])
   }, [activeTool])
 
   async function loadDocument(docId: string) {
@@ -237,6 +237,8 @@ export default function WorkspacePage() {
       const res = await apiFetch(`/api/documents/${id}/tools/overwrite-with/${newDoc.id}`, { method: 'POST' })
       if (!res.ok) { addToast('error', 'Failed to save changes to document.'); return }
       addToast('success', 'Document saved.')
+      // Clear redaction areas after successful application
+      if (activeTool === 'redact') setRedactAreas([])
       setActiveTool(null)
       await loadDocument(id)
     } catch {
@@ -418,30 +420,46 @@ export default function WorkspacePage() {
                         )
                     : activeTool === 'watermark'
                       ? (_pageNum, w, h) => (
-                          <WatermarkOverlay
-                            pageWidth={w}
-                            pageHeight={h}
-                            text={wmText}
-                            fontSize={wmFontSize}
-                            opacity={wmOpacity}
-                            rotation={wmRotation}
-                            position={wmPosition}
-                          />
+                          <>
+                            {/* Redactions as background overlay (read-only) */}
+                            {redactAreas.length > 0 && (
+                              <RedactPreviewOverlay pageNum={_pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
+                            )}
+                            <WatermarkOverlay
+                              pageWidth={w}
+                              pageHeight={h}
+                              text={wmText}
+                              fontSize={wmFontSize}
+                              opacity={wmOpacity}
+                              rotation={wmRotation}
+                              position={wmPosition}
+                            />
+                          </>
                         )
                     : activeTool === 'crop'
                       ? (_pageNum, w, h) => (
-                          <CropOverlay
-                            pageWidth={w}
-                            pageHeight={h}
-                            top={cropTop}
-                            right={cropRight}
-                            bottom={cropBottom}
-                            left={cropLeft}
-                            onTopChange={setCropTop}
-                            onRightChange={setCropRight}
-                            onBottomChange={setCropBottom}
-                            onLeftChange={setCropLeft}
-                          />
+                          <>
+                            {/* Redactions as background overlay (read-only) */}
+                            {redactAreas.length > 0 && (
+                              <RedactPreviewOverlay pageNum={_pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
+                            )}
+                            <CropOverlay
+                              pageWidth={w}
+                              pageHeight={h}
+                              top={cropTop}
+                              right={cropRight}
+                              bottom={cropBottom}
+                              left={cropLeft}
+                              onTopChange={setCropTop}
+                              onRightChange={setCropRight}
+                              onBottomChange={setCropBottom}
+                              onLeftChange={setCropLeft}
+                            />
+                          </>
+                        )
+                    : redactAreas.length > 0
+                      ? (pageNum, w, h) => (
+                          <RedactPreviewOverlay pageNum={pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
                         )
                     : undefined
                   }
