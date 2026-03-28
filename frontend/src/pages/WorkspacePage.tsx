@@ -102,6 +102,8 @@ export default function WorkspacePage() {
   // Scroll ref for Ctrl+scroll zoom
   const viewerScrollRef = useRef<HTMLDivElement>(null)
 
+  const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingScaleRef = useRef(scale)
   useEffect(() => {
     const el = viewerScrollRef.current
     if (!el) return
@@ -109,10 +111,12 @@ export default function WorkspacePage() {
       if (!e.ctrlKey) return
       e.preventDefault()
       e.stopPropagation()
-      setScale((s) => {
-        const delta = e.deltaY > 0 ? -0.15 : 0.15
-        return Math.min(Math.max(+(s + delta).toFixed(2), 0.5), 3)
-      })
+      const delta = e.deltaY > 0 ? -0.15 : 0.15
+      pendingScaleRef.current = Math.min(Math.max(+(pendingScaleRef.current + delta).toFixed(2), 0.5), 3)
+      if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current)
+      zoomTimerRef.current = setTimeout(() => {
+        setScale(pendingScaleRef.current)
+      }, 80)
     }
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
@@ -384,6 +388,7 @@ export default function WorkspacePage() {
                 <PdfViewer
                   pdfDoc={pdfDoc}
                   scale={scale}
+                  currentPage={currentPage}
                   onPageChange={setCurrentPage}
                   selectionMode={isSelectionMode}
                   selectedPages={selectedPages}

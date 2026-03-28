@@ -22,6 +22,7 @@ export interface AnnotationHandlers {
 interface PdfViewerProps {
   pdfDoc: pdfjsLib.PDFDocumentProxy
   scale: number
+  currentPage: number
   onPageChange: (n: number) => void
   selectionMode?: boolean
   selectedPages?: Set<number>
@@ -33,6 +34,7 @@ interface PdfViewerProps {
 export function PdfViewer({
   pdfDoc,
   scale,
+  currentPage,
   onPageChange,
   selectionMode = false,
   selectedPages,
@@ -42,15 +44,37 @@ export function PdfViewer({
 }: PdfViewerProps) {
   const pages = Array.from({ length: pdfDoc.numPages }, (_, i) => i + 1)
 
+  // Scroll to page when currentPage changes from external source (top-bar input, etc.)
+  const programmaticScrollRef = useRef(false)
+  const lastReportedPage = useRef(currentPage)
+
+  useEffect(() => {
+    if (currentPage === lastReportedPage.current) return
+    lastReportedPage.current = currentPage
+    const el = document.getElementById(`page-${currentPage}`)
+    if (!el) return
+    programmaticScrollRef.current = true
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Allow observer updates again after scroll settles
+    const timer = setTimeout(() => { programmaticScrollRef.current = false }, 600)
+    return () => clearTimeout(timer)
+  }, [currentPage])
+
+  const handleVisible = useCallback((n: number) => {
+    if (programmaticScrollRef.current) return
+    lastReportedPage.current = n
+    onPageChange(n)
+  }, [onPageChange])
+
   return (
     <div className="py-10 px-4 flex flex-col items-center">
       {pages.map((n) => (
         <PdfPage
-          key={`${n}-${scale}`}
+          key={n}
           pdfDoc={pdfDoc}
           pageNum={n}
           scale={scale}
-          onVisible={onPageChange}
+          onVisible={handleVisible}
           selectionMode={selectionMode}
           selected={selectedPages?.has(n) ?? false}
           onPageClick={onPageClick}
@@ -76,14 +100,42 @@ interface PdfPageProps {
   pageOverlay?: (pageNum: number, width: number, height: number) => React.ReactNode
 }
 
+const VIEWPORT_BUFFER = 1500 // px above/below viewport to pre-render
+
 function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, onPageClick, annotationHandlers, pageOverlay }: PdfPageProps) {
   const canvasRef   = useRef<HTMLCanvasElement>(null)
   const textLayerRef = useRef<HTMLDivElement>(null)
   const wrapRef     = useRef<HTMLDivElement>(null)
   const [rendered, setRendered] = useState(false)
   const [dims, setDims] = useState<{ w: number; h: number } | null>(null)
+  const [nearViewport, setNearViewport] = useState(false)
+
+  // Lazy rendering: only render pages within buffer distance of viewport
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setNearViewport(true) },
+      { rootMargin: `${VIEWPORT_BUFFER}px 0px ${VIEWPORT_BUFFER}px 0px` },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  // Placeholder dimensions (computed without rendering)
+  const [placeholderH, setPlaceholderH] = useState(842)
+  useEffect(() => {
+    let cancelled = false
+    pdfDoc.getPage(pageNum).then((page) => {
+      if (cancelled) return
+      const vp = page.getViewport({ scale })
+      setPlaceholderH(Math.floor(vp.height))
+    })
+    return () => { cancelled = true }
+  }, [pdfDoc, pageNum, scale])
 
   useEffect(() => {
+    if (!nearViewport) return
     let cancelled = false
     let textLayerInst: InstanceType<typeof TextLayer> | null = null
     setRendered(false)
@@ -94,7 +146,6 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
       const canvas = canvasRef.current
       if (!canvas || cancelled) return
 
-      // Render PDF page to canvas
       canvas.width  = Math.floor(viewport.width)
       canvas.height = Math.floor(viewport.height)
       const ctx = canvas.getContext('2d')!
@@ -104,7 +155,6 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
       setRendered(true)
       setDims({ w: Math.floor(viewport.width), h: Math.floor(viewport.height) })
 
-      // Render text layer for text selection
       const textDiv = textLayerRef.current
       if (!textDiv || cancelled) return
       textDiv.replaceChildren()
@@ -127,8 +177,9 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
       cancelled = true
       textLayerInst?.cancel()
     }
-  }, [pdfDoc, pageNum, scale])
+  }, [pdfDoc, pageNum, scale, nearViewport])
 
+  // Track which page is visible for the top-bar page indicator
   const stableOnVisible = useCallback(onVisible, [onVisible])
   useEffect(() => {
     const el = wrapRef.current
@@ -142,13 +193,17 @@ function PdfPage({ pdfDoc, pageNum, scale, onVisible, selectionMode, selected, o
   }, [pageNum, stableOnVisible])
 
   const ah = annotationHandlers
-  // Text selection is disabled while annotating (canvas overlay captures all events)
   const textSelectionActive = rendered && !ah && !selectionMode
 
   return (
-    <div id={`page-${pageNum}`} ref={wrapRef} className="mb-5 relative">
+    <div
+      id={`page-${pageNum}`}
+      ref={wrapRef}
+      className="mb-5 relative"
+      style={!rendered ? { minHeight: placeholderH, width: Math.round(595 * scale) } : undefined}
+    >
       {!rendered && (
-        <div className="bg-white/10 animate-pulse rounded" style={{ width: 595, height: 842 }} />
+        <div className="bg-white/10 animate-pulse rounded" style={{ width: Math.round(595 * scale), height: placeholderH }} />
       )}
       <canvas
         ref={canvasRef}

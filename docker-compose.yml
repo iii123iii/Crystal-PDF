@@ -41,6 +41,12 @@ services:
     # Not exposed to host — only reachable via the frontend proxy
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -54,7 +60,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - crystalpdf-net
     deploy:

@@ -22,15 +22,13 @@ FROM eclipse-temurin:21-jre-jammy
 # Install system processing tools required for PDF tools
 # - ghostscript: PDF compression and processing
 # - tesseract-ocr: Optical character recognition (OCR)
-# - libreoffice: Word/Office document to PDF conversion
+# - libreoffice-writer: Word/Office document to PDF conversion
 # - qpdf: PDF optimization and manipulation
 # - python3 + opencv: Image processing for PDF-to-Image conversion
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ghostscript \
         tesseract-ocr \
         libreoffice-writer \
-        libreoffice-calc \
-        libreoffice-impress \
         qpdf \
         python3 \
         python3-opencv \
@@ -42,4 +40,8 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-XX:+UseG1GC", \
+    "-jar", "app.jar"]
