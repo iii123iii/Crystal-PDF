@@ -1,3 +1,8 @@
 package com.crystalpdf.backend.dto;
 
-public record DeleteAccountRequest(String password) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record DeleteAccountRequest(
+        @NotBlank(message = "Password is required")
+        String password
+) {}

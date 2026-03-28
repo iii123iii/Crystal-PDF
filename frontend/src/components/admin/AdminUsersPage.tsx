@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Search, Trash2, Check, X, ShieldCheck, ShieldOff, KeyRound, MoreHorizontal } from 'lucide-react'
+import { Search, Trash2, Check, X, ShieldCheck, ShieldOff, KeyRound, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 import { useToastStore } from '../../store/useToastStore'
 import { useAppStore } from '../../store/useAppStore'
@@ -140,14 +140,24 @@ export default function AdminUsersPage() {
   const [query, setQuery]       = useState('')
   const [filter, setFilter]     = useState<Filter>('all')
   const [loading, setLoading]   = useState(true)
+  const [page, setPage]         = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const pageSize = 20
   const addToast  = useToastStore(s => s.addToast)
   const selfEmail = useAppStore(s => s.userEmail)
 
   function load() {
     setLoading(true)
-    apiFetch('/api/admin/users').then(r => r.json()).then(setUsers).catch(console.error).finally(() => setLoading(false))
+    apiFetch(`/api/admin/users?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(query)}&filter=${filter}`)
+      .then(r => r.json())
+      .then(data => {
+        setUsers(data.content || [])
+        setTotalPages(data.totalPages || 0)
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }
-  useEffect(load, [])
+  useEffect(load, [page, pageSize, query, filter])
 
   async function handleAction(user: AdminUser, action: string) {
     if (action === 'delete') {
@@ -173,14 +183,11 @@ export default function AdminUsersPage() {
     }
   }
 
-  const filtered = users
-    .filter(u => filter === 'all' ? true : filter === 'admin' ? u.admin : !u.admin)
-    .filter(u => u.email.toLowerCase().includes(query.toLowerCase()) || (u.username || '').toLowerCase().includes(query.toLowerCase()))
-
-  const tabs: { key: Filter; label: string; count: number }[] = [
-    { key: 'all',     label: 'All',     count: users.length },
-    { key: 'admin',   label: 'Admin',   count: users.filter(u => u.admin).length },
-    { key: 'regular', label: 'Regular', count: users.filter(u => !u.admin).length },
+  // Note: filtering is now done server-side; tabs counts are approximate (current page only)
+  const tabs: { key: Filter; label: string }[] = [
+    { key: 'all',     label: 'All' },
+    { key: 'admin',   label: 'Admin' },
+    { key: 'regular', label: 'Regular' },
   ]
 
   return (
@@ -199,19 +206,15 @@ export default function AdminUsersPage() {
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)', outline: 'none' }} />
         </div>
         <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
-          {tabs.map(({ key, label, count }) => (
-            <button key={key} onClick={() => setFilter(key)}
-              className="px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5"
+          {tabs.map(({ key, label }, idx) => (
+            <button key={key} onClick={() => { setFilter(key); setPage(0) }}
+              className="px-3 py-1.5 text-xs font-medium transition-all"
               style={{
                 background: filter === key ? 'rgba(245,158,11,0.12)' : 'transparent',
                 color: filter === key ? '#f59e0b' : 'var(--color-muted)',
-                borderRight: key !== 'regular' ? '1px solid var(--color-border)' : 'none',
+                borderRight: idx < tabs.length - 1 ? '1px solid var(--color-border)' : 'none',
               }}>
               {label}
-              <span className="text-xs px-1 rounded font-mono"
-                style={{ background: filter === key ? 'rgba(245,158,11,0.2)' : 'var(--color-surface-2)', color: filter === key ? '#f59e0b' : 'var(--color-muted)' }}>
-                {count}
-              </span>
             </button>
           ))}
         </div>
@@ -230,15 +233,15 @@ export default function AdminUsersPage() {
           <tbody>
             {loading ? (
               <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: 'var(--color-muted)', background: 'var(--color-surface)' }}>Loading…</td></tr>
-            ) : filtered.length === 0 ? (
+            ) : users.length === 0 ? (
               <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: 'var(--color-muted)', background: 'var(--color-surface)' }}>No users found.</td></tr>
-            ) : filtered.map((u, i) => {
+            ) : users.map((u, i) => {
               const pct = u.storageLimitBytes > 0 ? (u.storageUsedBytes / u.storageLimitBytes) * 100 : 0
               const color = barColor(pct)
               const isSelf = u.email === selfEmail
 
               return (
-                <tr key={u.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid var(--color-border)' : 'none', background: 'var(--color-surface)' }}>
+                <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? '1px solid var(--color-border)' : 'none', background: 'var(--color-surface)' }}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>
@@ -282,6 +285,41 @@ export default function AdminUsersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between">
+          <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+            Page {page + 1} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(Math.max(0, page - 1))}
+              disabled={page === 0}
+              className="p-2 rounded-lg transition-all"
+              style={{
+                background: page === 0 ? 'var(--color-surface-2)' : 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                color: page === 0 ? 'var(--color-muted)' : 'var(--color-text)',
+                cursor: page === 0 ? 'not-allowed' : 'pointer',
+              }}>
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+              disabled={page === totalPages - 1}
+              className="p-2 rounded-lg transition-all"
+              style={{
+                background: page === totalPages - 1 ? 'var(--color-surface-2)' : 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                color: page === totalPages - 1 ? 'var(--color-muted)' : 'var(--color-text)',
+                cursor: page === totalPages - 1 ? 'not-allowed' : 'pointer',
+              }}>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

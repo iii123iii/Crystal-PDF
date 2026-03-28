@@ -1,5 +1,12 @@
 package com.crystalpdf.backend.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+
 import java.util.List;
 
-public record SplitRequest(List<Integer> pages, String sourcePassword) {}
+public record SplitRequest(
+        @NotEmpty(message = "Pages list is required")
+        List<Integer> pages,
+
+        String sourcePassword
+) {}

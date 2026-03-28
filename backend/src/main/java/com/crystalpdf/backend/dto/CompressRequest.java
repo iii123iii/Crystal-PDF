@@ -1,3 +1,12 @@
 package com.crystalpdf.backend.dto;
 
-public record CompressRequest(String level, String sourcePassword) {}
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
+public record CompressRequest(
+        @NotBlank(message = "Compression level is required")
+        @Pattern(regexp = "low|medium|high", message = "Level must be 'low', 'medium', or 'high'")
+        String level,
+
+        String sourcePassword
+) {}

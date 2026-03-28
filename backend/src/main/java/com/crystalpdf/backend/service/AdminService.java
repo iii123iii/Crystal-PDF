@@ -14,6 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,8 +45,29 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<AdminUserResponse> getAllUsers() {
-        return userRepository.findAll().stream().map(user -> {
+    public Page<AdminUserResponse> getAllUsers(int page, int pageSize, String search, String filter) {
+        List<User> allUsers = userRepository.findAll();
+
+        // Apply search filter
+        if (search != null && !search.isBlank()) {
+            String q = search.toLowerCase();
+            allUsers = allUsers.stream()
+                    .filter(u -> u.getEmail().toLowerCase().contains(q) ||
+                            u.getDisplayUsername().toLowerCase().contains(q))
+                    .toList();
+        }
+
+        // Apply admin filter
+        if (filter != null && !filter.isBlank()) {
+            if ("admin".equalsIgnoreCase(filter)) {
+                allUsers = allUsers.stream().filter(User::isAdmin).toList();
+            } else if ("regular".equalsIgnoreCase(filter)) {
+                allUsers = allUsers.stream().filter(u -> !u.isAdmin()).toList();
+            }
+        }
+
+        // Convert to responses
+        List<AdminUserResponse> responses = allUsers.stream().map(user -> {
             List<Document> docs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(user.getId());
             long storageUsed = docs.stream().mapToLong(Document::getSizeBytes).sum();
             AppSettings settings = getSettingsEntity();
@@ -55,6 +80,14 @@ public class AdminService {
                     user.getCreatedAt() != null ? user.getCreatedAt().toString() : ""
             );
         }).toList();
+
+        // Apply pagination
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, responses.size());
+        List<AdminUserResponse> pageContent = responses.subList(start, end);
+        int totalPages = (int) Math.ceil((double) responses.size() / pageSize);
+
+        return new PageImpl<>(pageContent, PageRequest.of(page, pageSize), responses.size());
     }
 
     public void setStorageLimit(Long userId, Long limitBytes) {

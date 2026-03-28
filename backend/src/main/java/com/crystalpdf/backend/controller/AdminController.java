@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import java.util.Map;
 
 @RestController
@@ -28,9 +28,14 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<AdminUserResponse>> listUsers(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Page<AdminUserResponse>> listUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filter,
+            @AuthenticationPrincipal User user) {
         requireAdmin(user);
-        return ResponseEntity.ok(adminService.getAllUsers());
+        return ResponseEntity.ok(adminService.getAllUsers(page, pageSize, search, filter));
     }
 
     @PatchMapping("/users/{id}/storage-limit")

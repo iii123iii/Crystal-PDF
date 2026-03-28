@@ -42,6 +42,6 @@ crystalpdf:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
   admin:
     # Default admin user credentials (only used if no admin exists on startup)
-    email: ${ADMIN_EMAIL:admin@example.com}
+    email: ${ADMIN_EMAIL:admin}
     # STRONGLY RECOMMENDED: Change this password immediately after first login
-    password: ${ADMIN_PASSWORD:AdminChangeMe123!}
+    password: ${ADMIN_PASSWORD:admin}

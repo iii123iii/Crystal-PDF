@@ -1,3 +1,8 @@
 package com.crystalpdf.backend.dto;
 
-public record UnlockRequest(String password) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record UnlockRequest(
+        @NotBlank(message = "Password is required")
+        String password
+) {}
