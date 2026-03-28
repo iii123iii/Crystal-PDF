@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import com.crystalpdf.backend.config.JwtSecretConfig;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -13,14 +14,17 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    @Value("${crystalpdf.jwt.secret}")
-    private String secret;
+    private final JwtSecretConfig.JwtSecretProvider secretProvider;
 
     @Value("${crystalpdf.jwt.expiration-ms}")
     private long expirationMs;
 
+    public JwtService(JwtSecretConfig.JwtSecretProvider secretProvider) {
+        this.secretProvider = secretProvider;
+    }
+
     private SecretKey signingKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretProvider.getSecret()));
     }
 
     public String generateToken(UserDetails user) {

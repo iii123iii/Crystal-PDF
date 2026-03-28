@@ -1,5 +1,6 @@
 package com.crystalpdf.backend.service;
 
+import com.crystalpdf.backend.config.JwtSecretConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.User;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtServiceTest {
 
-    // Base64-encoded 256-bit key (same as application.yml dev default)
+    // Base64-encoded 256-bit key for testing
     private static final String SECRET =
             "Y3J5c3RhbHBkZi12Mi1qd3Qtc2VjcmV0LWtleS1wbGVhc2UtY2hhbmdlLWluLXByb2R1Y3Rpb24=";
     private static final long EXPIRATION_MS = 86_400_000L; // 24 h
@@ -22,8 +23,8 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "secret", SECRET);
+        JwtSecretConfig.JwtSecretProvider secretProvider = new JwtSecretConfig.JwtSecretProvider(SECRET);
+        jwtService = new JwtService(secretProvider);
         ReflectionTestUtils.setField(jwtService, "expirationMs", EXPIRATION_MS);
     }
 
@@ -69,8 +70,8 @@ class JwtServiceTest {
     @Test
     void isTokenValid_falseForExpiredToken() throws Exception {
         // Create a service whose tokens expire immediately
-        JwtService shortLived = new JwtService();
-        ReflectionTestUtils.setField(shortLived, "secret", SECRET);
+        JwtSecretConfig.JwtSecretProvider secretProvider = new JwtSecretConfig.JwtSecretProvider(SECRET);
+        JwtService shortLived = new JwtService(secretProvider);
         ReflectionTestUtils.setField(shortLived, "expirationMs", 1L); // 1 ms
         UserDetails user = userOf("alice@example.com");
         String token = shortLived.generateToken(user);

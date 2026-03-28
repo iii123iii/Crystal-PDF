@@ -31,11 +31,17 @@ crystalpdf:
     encryption-key: ${STORAGE_ENCRYPTION_KEY:a3f8c2e1d7b94f6a82e0c5d3b1f7a9e4c6d2b8f0a4e7c1d5b9f3a0e8c2d6b4f1}
   jwt:
     # Base64-encoded HMAC-SHA256 secret (at least 256 bits).
-    # REQUIRED: set JWT_SECRET env var in production. The default is for local dev only.
-    secret: ${JWT_SECRET:Y3J5c3RhbHBkZi12Mi1qd3Qtc2VjcmV0LWtleS1wbGVhc2UtY2hhbmdlLWluLXByb2R1Y3Rpb24=}
+    # Leave empty or unset to auto-generate a random secret on startup.
+    # For production with multiple instances, set JWT_SECRET env var to the same value on all instances.
+    secret: ${JWT_SECRET:}
     expiration-ms: 86400000  # 24 hours
   cors:
     # Comma-separated list of allowed origins for CORS.
     # REQUIRED: set CORS_ALLOWED_ORIGINS env var in production to your frontend domain(s).
     # Example: https://example.com,https://api.example.com
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  admin:
+    # Default admin user credentials (only used if no admin exists on startup)
+    email: ${ADMIN_EMAIL:admin@example.com}
+    # STRONGLY RECOMMENDED: Change this password immediately after first login
+    password: ${ADMIN_PASSWORD:AdminChangeMe123!}

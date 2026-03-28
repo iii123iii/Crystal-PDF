@@ -153,7 +153,9 @@ com.crystalpdf.backend
 | `DB_USERNAME` | `postgres` | DB username |
 | `DB_PASSWORD` | `postgres` | DB password |
 | `STORAGE_PATH` | `./storage` | Disk path for uploaded PDFs |
-| `JWT_SECRET` | (dev default in yml) | Base64-encoded JWT signing key |
+| `JWT_SECRET` | (auto-generated) | Base64-encoded HMAC-SHA256 key (256 bits). Leave unset for auto-generation. For multi-instance production, set to the same value on all servers. |
+| `ADMIN_EMAIL` | `admin@example.com` | Default admin email (only used if no admin exists on startup) |
+| `ADMIN_PASSWORD` | `AdminChangeMe123!` | Default admin password — **CHANGE IMMEDIATELY AFTER FIRST LOGIN** |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated CORS origins (e.g., `https://example.com,https://api.example.com`) |
 
 ### Security Features
@@ -163,9 +165,16 @@ com.crystalpdf.backend
 - `RateLimitFilter` tracks attempts in-memory; for production, integrate Redis and external rate-limiting service
 - Checks `X-Forwarded-For` header for proxied requests
 
+**JWT Secret:**
+- Auto-generated on startup if `JWT_SECRET` env var is not set
+- Generated secret is **not persisted** (session-only)
+- For multi-instance deployments, set `JWT_SECRET` to the same value on all servers
+- 256-bit (32-byte) random secrets generated using `SecureRandom`
+
 **Default Credentials:**
-- Auto-generated admin user: email=`admin@example.com`, password=`AdminChangeMe123!`
-- **MUST be changed immediately after first deployment**
+- Auto-generated admin user (configurable via `ADMIN_EMAIL` and `ADMIN_PASSWORD` env vars)
+- Defaults: email=`admin@example.com`, password=`AdminChangeMe123!`
+- **MUST be changed immediately after first login**
 - No auto-reset mechanism (prevents privilege escalation if password is forgotten)
 
 **CORS:**
