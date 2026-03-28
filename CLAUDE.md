@@ -1,106 +1,132 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Crystal-PDF
 
-Split-architecture PDF processing application.
+Full-stack PDF manipulation platform. Stateless Spring Boot REST API + React SPA, with JWT auth via HttpOnly cookies, file storage on disk, and PDF processing via server-side libraries.
 
-## Backend (Spring Boot 3 + Java 21 + Gradle)
+## Commands
 
-### Prerequisites
-Set `JAVA_HOME` to Java 21:
+### Backend (Spring Boot 3 + Java 21 + Gradle)
+
 ```bash
-export JAVA_HOME="/path/to/openjdk21"  # e.g., C:\Users\omrio\scoop\apps\openjdk21\21.0.2-13 on Windows
-```
+# Prerequisites: set JAVA_HOME to Java 21
+export JAVA_HOME="C:\Users\omrio\scoop\apps\openjdk21\21.0.2-13"  # Windows example
 
-### PostgreSQL Database (Local Development)
-For local development, you have two options:
-
-**Option 1: Docker (recommended)**
-```bash
-docker-compose up postgres -d
-```
-This starts a PostgreSQL container at `localhost:5432` with:
-- Database: `crystalpdf`
-- Username: `crystalpdf`
-- Password: `crystalpdf_secure_password`
-
-**Option 2: Manual PostgreSQL Installation**
-Install PostgreSQL 16+ locally, then create the database:
-```sql
-CREATE DATABASE crystalpdf;
-```
-Update `backend/src/main/resources/application.yml` with your connection details if using non-default credentials.
-
-### Build & Run Backend
-```bash
 cd backend
-
-# Build
-./gradlew build
-
-# Run (Spring will auto-create tables via JPA)
-./gradlew bootRun
-
-# Test
-./gradlew test
-
-# Clean
+./gradlew bootRun       # Run backend (port 8080)
+./gradlew build         # Build
+./gradlew test          # Run all tests
+./gradlew test --tests "com.crystalpdf.backend.SomeTest"  # Run single test
 ./gradlew clean
 ```
 
-Backend runs on `http://localhost:8080`.
-
-## Frontend (React + Vite + Tailwind CSS)
+### Frontend (React + Vite + TypeScript + Tailwind)
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Dev server
-npm run dev
-
-# Build
+npm run dev             # Dev server (port 5173)
 npm run build
-
-# Preview production build
 npm run preview
 ```
 
-Frontend dev server runs on `http://localhost:5173`.
-
-## Docker Compose (Full Stack)
-
-Run the entire application (PostgreSQL + Backend + Frontend) in containers:
+### Database (PostgreSQL)
 
 ```bash
-# Start all services
-docker-compose up -d
+docker-compose up postgres -d   # Start only DB (recommended for local dev)
+```
 
-# View logs
+DB: `crystalpdf` | User: `crystalpdf` | Password: `crystalpdf_secure_password` | Port: `5432`
+
+### Full Stack (Docker Compose)
+
+```bash
+docker-compose up -d            # All services (postgres + backend + frontend/nginx)
 docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f postgres
-
-# Stop all services
 docker-compose down
-
-# Remove volumes (careful: deletes database)
-docker-compose down -v
+docker-compose down -v          # Also deletes DB volume
 ```
 
-Frontend will be available at `http://localhost` (Nginx reverse proxy).
+Frontend at `http://localhost` (Nginx). Backend accessible via Nginx reverse proxy.
 
-## System Dependencies (required in production/Docker)
+---
 
-- LibreOffice (headless, for document-to-PDF conversion)
-- Ghostscript (PDF compression)
-- Tesseract OCR (text recognition)
-- QPDF (PDF optimization)
-- Python 3 with OpenCV (image processing)
+## Architecture
 
-## Project Structure
+### Backend Structure
 
 ```
-/backend    - Spring Boot 3 API (Java 21, Gradle)
-/frontend   - React SPA (Vite, TypeScript, Tailwind CSS)
+com.crystalpdf.backend
+├── config/         SecurityConfig (JWT filter, CORS, CSRF disabled), CorsConfig
+├── controller/     AuthController, DocumentController, WorkspaceToolController,
+│                   CompressController, MergeController, SplitController, etc.
+├── service/        AuthService, JwtService, StorageService, and one service per tool
+├── entity/         User, Document (JPA)
+├── repository/     UserRepository, DocumentRepository (Spring Data JPA)
+├── security/       JwtService (token gen/validate), JwtAuthFilter (per-request)
+├── exception/      GlobalExceptionHandler
+└── dto/            Request/response objects
 ```
+
+**Key backend behaviors:**
+- `StorageService.store()` validates PDF magic bytes (`%PDF`) before saving, generates UUID filenames, stores at `{STORAGE_PATH}/{userId}/{uuid}.pdf`, creates `Document` record in DB.
+- All tool endpoints are under `WorkspaceToolController` at `/api/documents/{id}/tools/{tool}`. Each tool loads the original file, processes it, and creates a new `Document` record (does not mutate the original).
+- `AnnotationFlattenService` takes normalized (0–1) coordinates from the frontend and uses PDFBox to bake pen/highlight/text annotations into a new PDF.
+- Compression uses Ghostscript via `ProcessBuilder` with a timeout.
+- `GlobalExceptionHandler` maps domain exceptions to HTTP status codes.
+
+### Frontend Structure
+
+**Pages:** `LoginPage`, `RegisterPage`, `WorkspacePage` (main editor)
+
+**State (Zustand):**
+- `useAppStore`: active tool, current document ID, user email — persisted to localStorage
+- `useToastStore`: toast notifications
+
+**PDF Viewer:**
+- `PdfViewer` integrates PDF.js; renders pages, handles zoom, stores current password for encrypted PDFs
+- `PageThumbnailStrip`: collapsible right panel with page thumbnails
+- `WorkspaceToolPanel`: sliding panel for tool options (split, compress, OCR, protect, etc.)
+
+**Annotation system:**
+- `useAnnotations` hook stores strokes and text boxes per page in memory, using normalized (0–1) coordinates
+- `AnnotationCanvas` renders on top of the PDF page
+- `FloatingAnnotateBar` controls tool/color/stroke width
+- On save: POST to `/api/documents/{id}/tools/flatten-annotations` with page data and scale
+
+**API layer:** All calls go through `apiFetch()` in `src/lib/api.ts`, which auto-redirects to `/login` on 401. `credentials: 'include'` is set on all requests (needed for HttpOnly cookie auth).
+
+**AuthGuard:** Wraps protected routes; redirects unauthenticated users to `/login`.
+
+### Auth Flow
+
+1. Login/register → backend sets HttpOnly `auth_token` cookie (JWT, 24h expiry)
+2. `JwtAuthFilter` validates the cookie on every request
+3. Frontend never reads the token directly; auth state is inferred from API response success/failure
+4. Only user email is stored in Zustand (display only)
+
+### Password-Protected PDFs
+
+- PDF.js prompts for password; it's stored in component state
+- Passed to all backend tool endpoints as `sourcePassword` in request body
+- Backend loads the encrypted PDF with the supplied password before processing
+
+### Environment Variables (Backend)
+
+| Variable | Default | Description |
+|---|---|---|
+| `DB_URL` | `jdbc:postgresql://localhost:5432/crystalpdf` | PostgreSQL connection |
+| `DB_USERNAME` | `postgres` | DB username |
+| `DB_PASSWORD` | `postgres` | DB password |
+| `STORAGE_PATH` | `./storage` | Disk path for uploaded PDFs |
+| `JWT_SECRET` | (dev default in yml) | Base64-encoded JWT signing key |
+
+### System Dependencies (required in production/Docker)
+
+- LibreOffice headless — Word/doc-to-PDF conversion
+- Ghostscript — PDF compression
+- Tesseract OCR — text recognition
+- QPDF — PDF optimization
+- Python 3 + OpenCV — image processing

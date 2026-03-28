@@ -1,6 +1,8 @@
 package com.crystalpdf.backend.controller;
 
 import com.crystalpdf.backend.service.CompressService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1")
 public class CompressController {
+
+    private static final Logger log = LoggerFactory.getLogger(CompressController.class);
 
     private final CompressService compressService;
 
@@ -40,7 +44,8 @@ public class CompressController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (IOException | InterruptedException e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+            log.error("PDF compression failed", e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "PDF compression failed. Please try again."));
         }
     }
 }

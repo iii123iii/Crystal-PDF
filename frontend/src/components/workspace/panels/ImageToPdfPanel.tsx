@@ -6,6 +6,7 @@ import { useToastStore } from '../../../store/useToastStore'
 
 interface ImageToPdfPanelProps {
   docId: string
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -17,7 +18,7 @@ function fmtSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export default function ImageToPdfPanel({ docId: _docId }: ImageToPdfPanelProps) {
+export default function ImageToPdfPanel({ docId: _docId, onSuccess }: ImageToPdfPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -62,6 +63,7 @@ export default function ImageToPdfPanel({ docId: _docId }: ImageToPdfPanelProps)
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

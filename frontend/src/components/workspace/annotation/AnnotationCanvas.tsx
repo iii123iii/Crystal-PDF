@@ -18,6 +18,8 @@ interface Props {
 }
 
 const ERASE_RADIUS = 0.035  // normalized
+// Default text box width (normalized) — must match value in handleMouseDown
+const TEXT_BOX_WIDTH = 0.22
 
 function drawStrokes(
   ctx: CanvasRenderingContext2D,
@@ -53,6 +55,8 @@ export default function AnnotationCanvas({
   const drawing = useRef(false)
   const currentPoints = useRef<Array<[number, number]>>([])
   const [eraserPos, setEraserPos] = useState<{ x: number; y: number } | null>(null)
+  // Normalized mouse position for text placement preview
+  const [textPreview, setTextPreview] = useState<{ x: number; y: number } | null>(null)
 
   // Setup canvas dimensions and redraw when anything changes
   const redraw = useCallback(() => {
@@ -70,6 +74,11 @@ export default function AnnotationCanvas({
     canvas.height = canvasHeight
     redraw()
   }, [canvasWidth, canvasHeight, redraw])
+
+  // Clear text preview when switching away from text tool
+  useEffect(() => {
+    if (tool !== 'text') setTextPreview(null)
+  }, [tool])
 
   function getNorm(e: React.MouseEvent): [number, number] {
     const canvas = canvasRef.current!
@@ -89,11 +98,12 @@ export default function AnnotationCanvas({
         id: crypto.randomUUID(),
         x,
         y,
-        width: 0.22,
+        width: TEXT_BOX_WIDTH,
         fontSize: 16,
         color,
         text: '',
       })
+      setTextPreview(null)
       return
     }
 
@@ -110,6 +120,11 @@ export default function AnnotationCanvas({
 
   function handleMouseMove(e: React.MouseEvent) {
     const [x, y] = getNorm(e)
+
+    if (tool === 'text') {
+      setTextPreview({ x, y })
+      return
+    }
 
     if (tool === 'eraser') {
       setEraserPos({ x: x * canvasWidth, y: y * canvasHeight })
@@ -166,13 +181,14 @@ export default function AnnotationCanvas({
   function handleMouseLeave() {
     drawing.current = false
     setEraserPos(null)
+    setTextPreview(null)
     currentPoints.current = []
     redraw()
   }
 
   const cursor =
     tool === 'pen' || tool === 'highlight' ? 'crosshair'
-    : tool === 'text' ? 'text'
+    : tool === 'text' ? 'none'   // custom preview replaces the cursor
     : 'none'
 
   const eraserPx = ERASE_RADIUS * canvasWidth
@@ -214,6 +230,50 @@ export default function AnnotationCanvas({
         />
       )}
 
+      {/* Text placement preview — blinking text cursor at exact click position */}
+      {tool === 'text' && textPreview && (
+        <div
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            left: textPreview.x * canvasWidth,
+            top: textPreview.y * canvasHeight,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 4,
+          }}
+        >
+          {/* Blinking I-beam cursor */}
+          <span
+            style={{
+              display: 'inline-block',
+              width: 2,
+              height: 20,
+              background: color,
+              borderRadius: 1,
+              animation: 'blink 1s step-end infinite',
+              boxShadow: `0 0 4px ${color}80`,
+            }}
+          />
+          {/* Subtle hint label */}
+          <span
+            style={{
+              fontSize: 10,
+              color,
+              opacity: 0.65,
+              userSelect: 'none',
+              background: 'rgba(0,0,0,0.45)',
+              borderRadius: 3,
+              padding: '1px 4px',
+              lineHeight: 1.6,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            click to place text
+          </span>
+        </div>
+      )}
+
       {/* Text annotation overlays */}
       {annotations.texts.map((text) => (
         <TextAnnotationBox
@@ -225,6 +285,8 @@ export default function AnnotationCanvas({
           onDelete={() => onTextDelete(text.id)}
         />
       ))}
+
+      <style>{`@keyframes blink { 50% { opacity: 0 } }`}</style>
     </div>
   )
 }

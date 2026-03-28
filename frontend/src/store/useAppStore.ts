@@ -1,16 +1,22 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+type Theme = 'dark' | 'light'
+
 interface AppState {
-  // ── Active tool (dashboard navigation) ───────────────────────────────────
   activeTool: string | null
   setActiveTool: (id: string | null) => void
 
-  // ── Auth ──────────────────────────────────────────────────────────────────
-  token: string | null
+  // Auth — token lives in HttpOnly cookie; only email stored here for UI
   userEmail: string | null
-  setAuth: (token: string, email: string) => void
+  isAdmin: boolean
+  passwordChangeRequired: boolean
+  setAuth: (email: string, isAdmin: boolean, passwordChangeRequired: boolean) => void
   clearAuth: () => void
+
+  // Theme
+  theme: Theme
+  toggleTheme: () => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -19,15 +25,35 @@ export const useAppStore = create<AppState>()(
       activeTool: null,
       setActiveTool: (id) => set({ activeTool: id }),
 
-      token: null,
       userEmail: null,
-      setAuth: (token, email) => set({ token, userEmail: email }),
-      clearAuth: () => set({ token: null, userEmail: null }),
+      isAdmin: false,
+      passwordChangeRequired: false,
+      setAuth: (email, isAdmin, passwordChangeRequired) =>
+        set({ userEmail: email, isAdmin, passwordChangeRequired }),
+      clearAuth: () => set({ userEmail: null, isAdmin: false, passwordChangeRequired: false }),
+
+      theme: 'dark',
+      toggleTheme: () =>
+        set((s) => {
+          const next = s.theme === 'dark' ? 'light' : 'dark'
+          document.documentElement.classList.toggle('light', next === 'light')
+          return { theme: next }
+        }),
     }),
     {
       name: 'crystalpdf-session',
-      // Only persist auth fields — activeTool resets on each session
-      partialize: (state) => ({ token: state.token, userEmail: state.userEmail }),
+      partialize: (state) => ({
+        userEmail: state.userEmail,
+        isAdmin: state.isAdmin,
+        passwordChangeRequired: state.passwordChangeRequired,
+        theme: state.theme,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Apply saved theme class on load
+        if (state?.theme === 'light') {
+          document.documentElement.classList.add('light')
+        }
+      },
     },
   ),
 )

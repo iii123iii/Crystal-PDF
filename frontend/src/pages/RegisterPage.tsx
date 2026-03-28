@@ -35,7 +35,7 @@ export default function RegisterPage() {
         return
       }
 
-      setAuth(data.token, email)
+      setAuth(data.email ?? email, data.admin ?? false, data.passwordChangeRequired ?? false)
       navigate('/dashboard', { replace: true })
     } catch {
       setError('Cannot reach the server. Is the backend running?')

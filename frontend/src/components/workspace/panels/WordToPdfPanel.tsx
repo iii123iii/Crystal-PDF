@@ -7,12 +7,13 @@ import { useToastStore } from '../../../store/useToastStore'
 interface WordToPdfPanelProps {
   docId: string
   docName: string
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
 interface ResultDoc { id: number; originalName: string }
 
-export default function WordToPdfPanel({ docId, docName }: WordToPdfPanelProps) {
+export default function WordToPdfPanel({ docId, docName, onSuccess }: WordToPdfPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [status, setStatus] = useState<Status>('idle')
@@ -39,6 +40,7 @@ export default function WordToPdfPanel({ docId, docName }: WordToPdfPanelProps) 
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

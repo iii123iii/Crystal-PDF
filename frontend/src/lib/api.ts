@@ -1,16 +1,17 @@
 import { useAppStore } from '../store/useAppStore'
 
 /**
- * Thin wrapper around fetch that automatically attaches the JWT Bearer token
- * when one is present in the Zustand store. Use this for all API calls.
+ * Thin wrapper around fetch for API calls.
+ * Auth is handled via an HttpOnly cookie set by the backend — no token management needed here.
+ * On 401, clears local auth state and redirects to login.
  */
 export async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const token = useAppStore.getState().token
-  const headers: Record<string, string> = {
-    ...(options.headers as Record<string, string> ?? {}),
+  const res = await fetch(url, options)
+
+  if (res.status === 401 && !window.location.pathname.startsWith('/login')) {
+    useAppStore.getState().clearAuth()
+    window.location.href = '/login'
   }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-  return fetch(url, { ...options, headers })
+
+  return res
 }

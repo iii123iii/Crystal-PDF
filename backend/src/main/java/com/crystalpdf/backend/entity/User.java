@@ -25,6 +25,18 @@ public class User implements UserDetails {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "username", unique = true, columnDefinition = "varchar(255)")
+    private String username;
+
+    @Column(name = "is_admin", nullable = false, columnDefinition = "boolean not null default false")
+    private boolean admin = false;
+
+    @Column(name = "password_change_required", nullable = false, columnDefinition = "boolean not null default false")
+    private boolean passwordChangeRequired = false;
+
+    @Column(name = "storage_limit_bytes")
+    private Long storageLimitBytes; // null = use default from AppSettings
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -32,11 +44,19 @@ public class User implements UserDetails {
 
     // ── Getters / Setters ─────────────────────────────────────────────────────
 
-    public Long getId()                        { return id; }
-    public String getEmail()                   { return email; }
-    public void setEmail(String email)         { this.email = email; }
+    public Long getId()                          { return id; }
+    public String getEmail()                     { return email; }
+    public String getDisplayUsername()           { return username; }
+    public void setDisplayUsername(String u)     { this.username = u; }
+    public void setEmail(String email)           { this.email = email; }
     public void setPassword(String password)   { this.password = password; }
     public LocalDateTime getCreatedAt()        { return createdAt; }
+    public boolean isAdmin()                   { return admin; }
+    public void setAdmin(boolean admin)        { this.admin = admin; }
+    public boolean isPasswordChangeRequired()  { return passwordChangeRequired; }
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) { this.passwordChangeRequired = passwordChangeRequired; }
+    public Long getStorageLimitBytes()         { return storageLimitBytes; }
+    public void setStorageLimitBytes(Long storageLimitBytes) { this.storageLimitBytes = storageLimitBytes; }
 
     // ── UserDetails ───────────────────────────────────────────────────────────
 

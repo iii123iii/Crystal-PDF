@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
-import { tools } from '../../data/tools'
+import { findTool } from '../../data/tools'
 import { useAppStore } from '../../store/useAppStore'
 
 export default function Header() {
   const activeTool = useAppStore((s) => s.activeTool)
   const userEmail = useAppStore((s) => s.userEmail)
   const clearAuth = useAppStore((s) => s.clearAuth)
-  const tool = tools.find((t) => t.id === activeTool)
+  const tool = findTool(activeTool ?? '')
   const navigate = useNavigate()
 
   function handleLogout() {

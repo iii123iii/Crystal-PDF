@@ -1,3 +1,4 @@
+// Legacy ToolCard — kept for compatibility; new tool cards are in Dashboard.tsx
 import { type Tool } from '../../data/tools'
 
 interface ToolCardProps {
@@ -6,25 +7,22 @@ interface ToolCardProps {
 }
 
 export default function ToolCard({ tool, onSelect }: ToolCardProps) {
-  const { id, label, description, icon: Icon, color, borderHover } = tool
+  const { id, label, description, icon: Icon, color } = tool
 
   return (
     <button
       onClick={() => onSelect(id)}
-      className={`
-        group text-left w-full
-        bg-slate-800/50 border border-slate-700/60 rounded-xl p-5
-        transition-all duration-200
-        hover:bg-slate-800 hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5
-        ${borderHover}
-      `}
+      className="group text-left w-full rounded-xl p-5 transition-all"
+      style={{
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+      }}
     >
-      <div className={`mb-4 transition-transform duration-200 group-hover:scale-110 inline-block ${color}`}>
+      <div className="mb-4 inline-block" style={{ color }}>
         <Icon size={28} strokeWidth={1.75} />
       </div>
-
-      <p className="font-semibold text-white text-sm mb-1">{label}</p>
-      <p className="text-slate-400 text-xs leading-relaxed">{description}</p>
+      <p className="font-semibold text-sm mb-1" style={{ color: 'var(--color-text)' }}>{label}</p>
+      <p className="text-xs leading-relaxed" style={{ color: 'var(--color-muted)' }}>{description}</p>
     </button>
   )
 }

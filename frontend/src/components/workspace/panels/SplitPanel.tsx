@@ -11,6 +11,7 @@ interface SplitPanelProps {
   onSelectAll: () => void
   onClearAll: () => void
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -20,7 +21,7 @@ interface ResultDoc {
   originalName: string
 }
 
-export default function SplitPanel({ docId, totalPages, selectedPages, onSelectAll, onClearAll, pdfPassword }: SplitPanelProps) {
+export default function SplitPanel({ docId, totalPages, selectedPages, onSelectAll, onClearAll, pdfPassword, onSuccess }: SplitPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [status, setStatus] = useState<Status>('idle')
@@ -47,6 +48,7 @@ export default function SplitPanel({ docId, totalPages, selectedPages, onSelectA
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

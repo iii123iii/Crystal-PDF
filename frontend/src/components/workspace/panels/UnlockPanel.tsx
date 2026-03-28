@@ -7,12 +7,13 @@ import { useToastStore } from '../../../store/useToastStore'
 interface UnlockPanelProps {
   docId: string
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
 interface ResultDoc { id: number; originalName: string }
 
-export default function UnlockPanel({ docId, pdfPassword }: UnlockPanelProps) {
+export default function UnlockPanel({ docId, pdfPassword, onSuccess }: UnlockPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   // Pre-fill with the password used to open the PDF (if any)
@@ -39,6 +40,7 @@ export default function UnlockPanel({ docId, pdfPassword }: UnlockPanelProps) {
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

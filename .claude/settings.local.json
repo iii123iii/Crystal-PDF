@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(JAVA_HOME=\"/c/Users/omrio/scoop/apps/openjdk21/21.0.2-13\" ./gradlew build -x test)",
+      "Bash(./gradlew build:*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ import com.crystalpdf.backend.entity.User;
 import com.crystalpdf.backend.repository.DocumentRepository;
 import com.crystalpdf.backend.service.ImageToPdfService;
 import com.crystalpdf.backend.service.StorageService;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -78,13 +79,13 @@ public class DocumentController {
         Document doc = documentRepository.findByIdAndOwnerId(id, user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Document not found."));
 
-        Resource resource = storageService.load(doc);
+        byte[] bytes = storageService.loadBytes(doc);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(doc.getMimeType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + doc.getOriginalName() + "\"")
-                .body(resource);
+                .body(new ByteArrayResource(bytes));
     }
 
     /** Delete a document and its physical file. Only the owner may delete it. */

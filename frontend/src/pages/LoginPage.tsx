@@ -4,12 +4,12 @@ import { Loader2, Gem } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const setAuth = useAppStore((s) => s.setAuth)
+  const setAuth  = useAppStore((s) => s.setAuth)
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/dashboard'
@@ -23,7 +23,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       })
 
       const data = await res.json()
@@ -33,8 +33,14 @@ export default function LoginPage() {
         return
       }
 
-      setAuth(data.token, email)
-      navigate(from, { replace: true })
+      setAuth(data.email ?? identifier, data.admin ?? false, data.passwordChangeRequired ?? false)
+      if (data.passwordChangeRequired) {
+        navigate('/force-change-password', { replace: true })
+      } else if (data.admin) {
+        navigate('/admin', { replace: true })
+      } else {
+        navigate(from, { replace: true })
+      }
     } catch {
       setError('Cannot reach the server. Is the backend running?')
     } finally {
@@ -63,15 +69,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">
-                Email
+                Email or username
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
-                autoComplete="email"
-                placeholder="you@example.com"
+                autoComplete="username"
+                placeholder="you@example.com or username"
                 className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500 focus:bg-white/[0.07] transition-colors"
               />
             </div>

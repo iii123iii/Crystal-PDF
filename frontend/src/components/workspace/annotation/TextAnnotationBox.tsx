@@ -14,12 +14,12 @@ export default function TextAnnotationBox({
   annotation, canvasWidth, canvasHeight, onUpdate, onDelete,
 }: Props) {
   const [editing, setEditing] = useState(annotation.text === '')
+  const [hovered, setHovered] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const boxRef = useRef<HTMLDivElement>(null)
 
-  // px coords
-  const left = annotation.x * canvasWidth
-  const top = annotation.y * canvasHeight
+  // px coords — top-left of box matches the annotation (x,y) exactly
+  const left  = annotation.x * canvasWidth
+  const top   = annotation.y * canvasHeight
   const width = annotation.width * canvasWidth
 
   useEffect(() => {
@@ -34,12 +34,7 @@ export default function TextAnnotationBox({
   function onDragStart(e: React.MouseEvent) {
     if (editing) return
     e.preventDefault()
-    dragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      ox: annotation.x,
-      oy: annotation.y,
-    }
+    dragRef.current = { startX: e.clientX, startY: e.clientY, ox: annotation.x, oy: annotation.y }
     window.addEventListener('mousemove', onDragMove)
     window.addEventListener('mouseup', onDragEnd)
   }
@@ -85,33 +80,23 @@ export default function TextAnnotationBox({
 
   return (
     <div
-      ref={boxRef}
-      style={{
-        position: 'absolute',
-        left,
-        top,
-        width,
-        minHeight: 28,
-        cursor: editing ? 'text' : 'move',
-        zIndex: 10,
-      }}
+      style={{ position: 'absolute', left, top, width, zIndex: 10 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onMouseDown={onDragStart}
       onDoubleClick={() => setEditing(true)}
     >
-      {/* Container */}
-      <div
-        style={{
-          position: 'relative',
-          background: 'rgba(7,16,28,0.55)',
-          backdropFilter: 'blur(6px)',
-          border: `1.5px solid ${annotation.color}60`,
-          borderRadius: 6,
-          padding: '4px 6px',
-          minHeight: 28,
-          boxShadow: `0 2px 16px rgba(0,0,0,0.4), 0 0 0 1px ${annotation.color}20`,
-        }}
-      >
-        {editing ? (
+      {editing ? (
+        // ── Edit mode: subtle border so you can see the box bounds ──────────
+        <div
+          style={{
+            position: 'relative',
+            border: `1.5px solid ${annotation.color}80`,
+            borderRadius: 4,
+            padding: '0px 4px',
+            background: `${annotation.color}08`,
+          }}
+        >
           <textarea
             ref={textareaRef}
             value={annotation.text}
@@ -131,11 +116,12 @@ export default function TextAnnotationBox({
               resize: 'none',
               color: annotation.color,
               fontSize: annotation.fontSize,
-              fontFamily: 'inherit',
+              fontFamily: 'Helvetica, Arial, sans-serif',
               lineHeight: 1.4,
               cursor: 'text',
               minHeight: 24,
               overflow: 'hidden',
+              padding: 0,
             }}
             rows={1}
             onInput={(e) => {
@@ -144,63 +130,98 @@ export default function TextAnnotationBox({
               t.style.height = t.scrollHeight + 'px'
             }}
           />
-        ) : (
+
+          {/* Delete button */}
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onDelete() }}
+            style={{
+              position: 'absolute',
+              top: -8, right: -8,
+              width: 18, height: 18,
+              borderRadius: '50%',
+              background: '#ef4444',
+              border: '1.5px solid rgba(0,0,0,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', zIndex: 20, padding: 0,
+            }}
+          >
+            <X size={10} color="white" strokeWidth={2.5} />
+          </button>
+
+          {/* Resize handle */}
+          <div
+            onMouseDown={onResizeStart}
+            style={{
+              position: 'absolute', bottom: -5, right: -5,
+              width: 12, height: 12,
+              background: annotation.color,
+              border: '2px solid rgba(7,16,28,0.8)',
+              borderRadius: 3, cursor: 'se-resize', zIndex: 20,
+            }}
+          />
+        </div>
+      ) : (
+        // ── View mode: just the text, visually matches the saved PDF ────────
+        <div
+          style={{
+            position: 'relative',
+            cursor: 'move',
+            // Subtle outline only on hover so the annotation is findable but unobtrusive
+            outline: hovered ? `1.5px dashed ${annotation.color}60` : '1.5px dashed transparent',
+            outlineOffset: 2,
+            borderRadius: 3,
+          }}
+        >
           <div
             style={{
               color: annotation.color,
               fontSize: annotation.fontSize,
+              fontFamily: 'Helvetica, Arial, sans-serif',
               lineHeight: 1.4,
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
-              minHeight: 20,
               userSelect: 'none',
             }}
           >
-            {annotation.text || <span style={{ opacity: 0.4 }}>Double-click to edit</span>}
+            {annotation.text || (
+              <span style={{ opacity: 0.35, fontStyle: 'italic' }}>double-click to edit</span>
+            )}
           </div>
-        )}
 
-        {/* Delete button */}
-        <button
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); onDelete() }}
-          style={{
-            position: 'absolute',
-            top: -8,
-            right: -8,
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            background: '#ef4444',
-            border: '1.5px solid rgba(0,0,0,0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 20,
-            padding: 0,
-          }}
-        >
-          <X size={10} color="white" strokeWidth={2.5} />
-        </button>
+          {/* Controls visible only on hover */}
+          {hovered && (
+            <>
+              <button
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); onDelete() }}
+                style={{
+                  position: 'absolute', top: -8, right: -8,
+                  width: 18, height: 18,
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  border: '1.5px solid rgba(0,0,0,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', zIndex: 20, padding: 0,
+                }}
+              >
+                <X size={10} color="white" strokeWidth={2.5} />
+              </button>
 
-        {/* Resize handle */}
-        <div
-          onMouseDown={onResizeStart}
-          style={{
-            position: 'absolute',
-            bottom: -5,
-            right: -5,
-            width: 12,
-            height: 12,
-            background: annotation.color,
-            border: '2px solid rgba(7,16,28,0.8)',
-            borderRadius: 3,
-            cursor: 'se-resize',
-            zIndex: 20,
-          }}
-        />
-      </div>
+              <div
+                onMouseDown={onResizeStart}
+                style={{
+                  position: 'absolute', bottom: -5, right: -5,
+                  width: 12, height: 12,
+                  background: annotation.color,
+                  border: '2px solid rgba(7,16,28,0.8)',
+                  borderRadius: 3, cursor: 'se-resize', zIndex: 20,
+                }}
+              />
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

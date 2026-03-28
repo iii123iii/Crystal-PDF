@@ -6,6 +6,7 @@ import { useToastStore } from '../../../store/useToastStore'
 interface PdfToImagePanelProps {
   docId: string
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -18,7 +19,7 @@ const DPI_OPTIONS = [
   { value: 300, label: '300', desc: 'Print' },
 ]
 
-export default function PdfToImagePanel({ docId, pdfPassword }: PdfToImagePanelProps) {
+export default function PdfToImagePanel({ docId, pdfPassword, onSuccess }: PdfToImagePanelProps) {
   const addToast = useToastStore((s) => s.addToast)
   const [format, setFormat] = useState<'png' | 'jpg'>('png')
   const [dpi, setDpi] = useState(150)
@@ -44,6 +45,7 @@ export default function PdfToImagePanel({ docId, pdfPassword }: PdfToImagePanelP
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

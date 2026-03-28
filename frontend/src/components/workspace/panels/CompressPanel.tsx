@@ -7,6 +7,7 @@ import { useToastStore } from '../../../store/useToastStore'
 interface CompressPanelProps {
   docId: string
   pdfPassword?: string | null
+  onSuccess?: (doc: { id: number; originalName: string }) => void
 }
 
 type Level = 'screen' | 'ebook' | 'printer' | 'prepress'
@@ -21,7 +22,7 @@ const LEVELS: { value: Level; label: string; desc: string }[] = [
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function CompressPanel({ docId, pdfPassword }: CompressPanelProps) {
+export default function CompressPanel({ docId, pdfPassword, onSuccess }: CompressPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [level, setLevel] = useState<Level>('ebook')
@@ -46,6 +47,7 @@ export default function CompressPanel({ docId, pdfPassword }: CompressPanelProps
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

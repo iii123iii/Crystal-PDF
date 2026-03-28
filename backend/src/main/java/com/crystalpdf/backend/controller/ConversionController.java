@@ -53,6 +53,9 @@ public class ConversionController {
             @RequestParam(value = "format", defaultValue = "png") String format,
             @RequestParam(value = "dpi", defaultValue = "150") int dpi) {
         try {
+            if (!"png".equalsIgnoreCase(format) && !"jpg".equalsIgnoreCase(format)) {
+                return ResponseEntity.badRequest().build();
+            }
             int safeDpi = Math.min(Math.max(dpi, 72), 300);
             byte[] result = pdfToImageService.convert(file, format, safeDpi);
 

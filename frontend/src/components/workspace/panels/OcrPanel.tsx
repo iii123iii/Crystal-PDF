@@ -7,6 +7,7 @@ import { useToastStore } from '../../../store/useToastStore'
 interface OcrPanelProps {
   docId: string
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
@@ -26,7 +27,7 @@ const LANGUAGES = [
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function OcrPanel({ docId, pdfPassword }: OcrPanelProps) {
+export default function OcrPanel({ docId, pdfPassword, onSuccess }: OcrPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [language, setLanguage] = useState('eng')
@@ -51,6 +52,7 @@ export default function OcrPanel({ docId, pdfPassword }: OcrPanelProps) {
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

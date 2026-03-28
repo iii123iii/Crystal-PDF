@@ -8,6 +8,7 @@ interface MergePanelProps {
   docId: string
   docName: string
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 interface DocItem {
@@ -25,7 +26,7 @@ function fmtSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export default function MergePanel({ docId, docName, pdfPassword }: MergePanelProps) {
+export default function MergePanel({ docId, docName, pdfPassword, onSuccess }: MergePanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [docs, setDocs] = useState<DocItem[]>([])
@@ -73,6 +74,7 @@ export default function MergePanel({ docId, docName, pdfPassword }: MergePanelPr
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

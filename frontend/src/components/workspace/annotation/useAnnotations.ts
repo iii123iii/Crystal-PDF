@@ -94,5 +94,9 @@ export function useAnnotations() {
     setPages(prev => ({ ...prev, [page]: EMPTY }))
   }, [])
 
-  return { getPage, addStroke, addText, updateText, deleteText, eraseAt, undo, clearPage }
+  const clearAllPages = useCallback(() => {
+    setPages({})
+  }, [])
+
+  return { pages, getPage, addStroke, addText, updateText, deleteText, eraseAt, undo, clearPage, clearAllPages }
 }

@@ -3,19 +3,18 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import WorkspacePage from './pages/WorkspacePage'
 import LandingPage from './pages/LandingPage'
+import ForcePasswordChangePage from './pages/ForcePasswordChangePage'
 import AuthGuard from './components/auth/AuthGuard'
-import Sidebar from './components/layout/Sidebar'
-import Workspace from './components/layout/Workspace'
+import AdminGuard from './components/auth/AdminGuard'
+import AdminLayout from './components/admin/AdminLayout'
+import AdminDashboard from './components/admin/AdminDashboard'
+import AdminUsersPage from './components/admin/AdminUsersPage'
+import AdminSettingsPage from './components/admin/AdminSettingsPage'
+import DashboardLayout from './components/layout/DashboardLayout'
+import Dashboard from './components/dashboard/Dashboard'
+import MyFiles from './components/dashboard/MyFiles'
+import SettingsView from './components/layout/SettingsView'
 import ToastContainer from './components/ui/ToastContainer'
-
-function MainLayout() {
-  return (
-    <div className="flex h-full">
-      <Sidebar />
-      <Workspace />
-    </div>
-  )
-}
 
 export default function App() {
   return (
@@ -24,7 +23,23 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        {/* Workspace must be declared before /* so it isn't eaten by the catch-all */}
+        <Route path="/force-change-password" element={<ForcePasswordChangePage />} />
+
+        {/* Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminGuard>
+              <AdminLayout />
+            </AdminGuard>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+        </Route>
+
+        {/* Workspace (PDF editor) */}
         <Route
           path="/workspace/:id"
           element={
@@ -33,14 +48,19 @@ export default function App() {
             </AuthGuard>
           }
         />
+
+        {/* Dashboard with horizontal header */}
         <Route
-          path="/*"
           element={
             <AuthGuard>
-              <MainLayout />
+              <DashboardLayout />
             </AuthGuard>
           }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/files" element={<MyFiles />} />
+          <Route path="/settings" element={<SettingsView />} />
+        </Route>
       </Routes>
       <ToastContainer />
     </BrowserRouter>

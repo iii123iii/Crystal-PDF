@@ -7,13 +7,14 @@ import { useToastStore } from '../../../store/useToastStore'
 interface ProtectPanelProps {
   docId: string
   pdfPassword?: string | null
+  onSuccess?: (doc: ResultDoc) => void
 }
 
 type Status = 'idle' | 'processing' | 'done' | 'error'
 
 interface ResultDoc { id: number; originalName: string }
 
-export default function ProtectPanel({ docId, pdfPassword }: ProtectPanelProps) {
+export default function ProtectPanel({ docId, pdfPassword, onSuccess }: ProtectPanelProps) {
   const navigate = useNavigate()
   const addToast = useToastStore((s) => s.addToast)
   const [userPw, setUserPw] = useState('')
@@ -43,6 +44,7 @@ export default function ProtectPanel({ docId, pdfPassword }: ProtectPanelProps) 
       setResult(doc)
       setStatus('done')
       addToast('success', `Saved "${doc.originalName}"`)
+      onSuccess?.(doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')

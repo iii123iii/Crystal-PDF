@@ -1,4 +1,5 @@
-import { Eraser, Highlighter, Pencil, RotateCcw, Trash2, Type } from 'lucide-react'
+import { Eraser, Highlighter, Loader2, Pencil, RotateCcw, Save, Trash2, Type } from 'lucide-react'
+import { useRef } from 'react'
 import type { AnnotationTool } from './useAnnotations'
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
   onStrokeWidthChange: (w: number) => void
   onUndo: () => void
   onClearPage: () => void
+  onSave: () => void
+  saving?: boolean
 }
 
 const TOOLS: { id: AnnotationTool; icon: React.ComponentType<{ size?: number; strokeWidth?: number }>; label: string }[] = [
@@ -20,6 +23,7 @@ const TOOLS: { id: AnnotationTool; icon: React.ComponentType<{ size?: number; st
 ]
 
 const COLORS = [
+  { value: '#000000', label: 'Black'  },
   { value: '#e2e8f0', label: 'White'  },
   { value: '#3b82f6', label: 'Blue'   },
   { value: '#22c55e', label: 'Green'  },
@@ -59,7 +63,9 @@ export default function FloatingAnnotateBar({
   color, onColorChange,
   strokeWidth, onStrokeWidthChange,
   onUndo, onClearPage,
+  onSave, saving = false,
 }: Props) {
+  const colorInputRef = useRef<HTMLInputElement>(null)
   const presets = WIDTH_PRESETS[tool]
   const activePresetIdx = presets.indexOf(strokeWidth) === -1
     ? 1
@@ -84,14 +90,11 @@ export default function FloatingAnnotateBar({
   return (
     <div
       style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
         display: 'flex',
         justifyContent: 'center',
-        padding: '10px 16px 6px',
-        background: 'linear-gradient(to bottom, #0a1520 60%, transparent)',
-        pointerEvents: 'none',
+        padding: '8px 16px',
+        background: 'var(--color-surface)',
+        borderBottom: '1px solid var(--color-border)',
       }}
     >
       <div
@@ -105,7 +108,6 @@ export default function FloatingAnnotateBar({
           border: '1px solid rgba(255,255,255,0.09)',
           borderRadius: 14,
           boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05) inset',
-          pointerEvents: 'auto',
           userSelect: 'none',
         }}
       >
@@ -170,7 +172,7 @@ export default function FloatingAnnotateBar({
 
         <Divider />
 
-        {/* ── Color swatches ── */}
+        {/* ── Color swatches + custom picker ── */}
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', padding: '0 4px' }}>
           {COLORS.map(({ value, label }) => {
             const active = color === value
@@ -198,6 +200,36 @@ export default function FloatingAnnotateBar({
               />
             )
           })}
+
+          {/* Custom color picker */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <button
+              title="Custom color"
+              onClick={() => colorInputRef.current?.click()}
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: `conic-gradient(red, yellow, lime, cyan, blue, magenta, red)`,
+                border: !COLORS.some(c => c.value === color)
+                  ? '2px solid rgba(255,255,255,0.9)'
+                  : '2px solid rgba(255,255,255,0.15)',
+                cursor: 'pointer',
+                boxShadow: !COLORS.some(c => c.value === color)
+                  ? `0 0 0 2px rgba(0,0,0,0.6), 0 0 8px ${color}80`
+                  : '0 0 0 1px rgba(0,0,0,0.3)',
+                transition: 'all 0.12s',
+                padding: 0,
+              }}
+            />
+            <input
+              ref={colorInputRef}
+              type="color"
+              value={color}
+              onChange={(e) => onColorChange(e.target.value)}
+              style={{ position: 'absolute', width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
+            />
+          </div>
         </div>
 
         {/* ── Stroke width (hidden for eraser/text) ── */}
@@ -246,6 +278,50 @@ export default function FloatingAnnotateBar({
             <Trash2 size={13} strokeWidth={2} />
           </ActionBtn>
         </div>
+
+        <Divider />
+
+        {/* ── Save to PDF ── */}
+        <button
+          title="Save annotations to PDF"
+          onClick={onSave}
+          disabled={saving}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            height: 30,
+            padding: '0 10px',
+            borderRadius: 7,
+            border: '1px solid rgba(99,202,183,0.3)',
+            background: saving ? 'rgba(99,202,183,0.06)' : 'rgba(99,202,183,0.12)',
+            color: saving ? 'rgba(99,202,183,0.5)' : '#63cab7',
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            transition: 'all 0.15s',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseEnter={(e) => {
+            if (!saving) {
+              const el = e.currentTarget as HTMLButtonElement
+              el.style.background = 'rgba(99,202,183,0.2)'
+              el.style.borderColor = 'rgba(99,202,183,0.5)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.background = saving ? 'rgba(99,202,183,0.06)' : 'rgba(99,202,183,0.12)'
+            el.style.borderColor = 'rgba(99,202,183,0.3)'
+          }}
+        >
+          {saving
+            ? <Loader2 size={12} strokeWidth={2} className="animate-spin" />
+            : <Save size={12} strokeWidth={2} />
+          }
+          Save to PDF
+        </button>
       </div>
     </div>
   )

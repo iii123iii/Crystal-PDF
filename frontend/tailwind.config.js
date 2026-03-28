@@ -4,25 +4,27 @@ export default {
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        brand: {
-          50:  '#f0f4ff',
-          100: '#dce6ff',
-          200: '#b9cdff',
-          300: '#8aadff',
-          400: '#5585ff',
-          500: '#2d62ff',
-          600: '#1a44f5',
-          700: '#1333d1',
-          800: '#162baa',
-          900: '#172985',
+        // Semantic tokens mapped to CSS variables
+        surface: 'var(--color-surface)',
+        border: 'var(--color-border)',
+        muted: 'var(--color-muted)',
+        // Category colors
+        cat: {
+          organize: '#3b82f6',
+          convert:  '#8b5cf6',
+          security: '#ef4444',
+          optimize: '#10b981',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        sans:    ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono:    ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        // keep old display for WorkspacePage logo
+        display: ['Plus Jakarta Sans', 'Georgia', 'serif'],
       },
     },
   },

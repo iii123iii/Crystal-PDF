@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react'
-import { tools } from '../../data/tools'
+import { findTool } from '../../data/tools'
 import MergeTool from '../tools/MergeTool'
 import SplitTool from '../tools/SplitTool'
 import ProtectTool from '../tools/ProtectTool'
@@ -29,7 +29,7 @@ const toolComponents: Partial<Record<string, React.ComponentType>> = {
 }
 
 export default function ToolView({ toolId, onBack }: ToolViewProps) {
-  const tool = tools.find((t) => t.id === toolId)
+  const tool = findTool(toolId)
   if (!tool) return null
 
   const ToolComponent = toolComponents[toolId]
@@ -39,7 +39,10 @@ export default function ToolView({ toolId, onBack }: ToolViewProps) {
     <div className="max-w-2xl mx-auto w-full">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-8 transition-colors"
+        className="flex items-center gap-2 text-sm mb-8 transition-colors"
+        style={{ color: 'var(--color-muted)' }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
+        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-muted)')}
       >
         <ArrowLeft size={15} />
         All Tools
@@ -48,14 +51,23 @@ export default function ToolView({ toolId, onBack }: ToolViewProps) {
       {ToolComponent ? (
         <ToolComponent />
       ) : (
-        <div className="bg-slate-800/50 border border-slate-700/60 rounded-xl p-8 text-center">
-          <div className={`inline-block mb-4 ${color}`}>
+        <div
+          className="rounded-xl p-8 text-center"
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+          }}
+        >
+          <div className="inline-block mb-4" style={{ color }}>
             <Icon size={40} strokeWidth={1.5} />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">{label}</h2>
-          <p className="text-slate-400 text-sm mb-6">{description}</p>
-          <span className="inline-block bg-slate-700/50 text-slate-400 text-xs px-3 py-1 rounded-full">
-            Coming in a future phase
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>{label}</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--color-muted)' }}>{description}</p>
+          <span
+            className="inline-block text-xs px-3 py-1 rounded-full"
+            style={{ background: 'var(--color-surface-2)', color: 'var(--color-muted)', border: '1px solid var(--color-border)' }}
+          >
+            Coming soon
           </span>
         </div>
       )}

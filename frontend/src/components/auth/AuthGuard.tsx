@@ -6,10 +6,10 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const token = useAppStore((s) => s.token)
+  const userEmail = useAppStore((s) => s.userEmail)
   const location = useLocation()
 
-  if (!token) {
+  if (!userEmail) {
     // Preserve the intended destination so we can redirect back after login
     return <Navigate to="/login" state={{ from: location }} replace />
   }

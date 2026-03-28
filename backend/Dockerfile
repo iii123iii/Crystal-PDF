@@ -19,15 +19,22 @@ RUN ./gradlew bootJar --no-daemon -x test
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-jammy
 
-# Install system processing tools
+# Install system processing tools required for PDF tools
+# - ghostscript: PDF compression and processing
+# - tesseract-ocr: Optical character recognition (OCR)
+# - libreoffice: Word/Office document to PDF conversion
+# - qpdf: PDF optimization and manipulation
+# - python3 + opencv: Image processing for PDF-to-Image conversion
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        ghostscript \
+        tesseract-ocr \
         libreoffice-writer \
         libreoffice-calc \
-        ghostscript \
+        libreoffice-impress \
         qpdf \
-        tesseract-ocr \
         python3 \
         python3-opencv \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
