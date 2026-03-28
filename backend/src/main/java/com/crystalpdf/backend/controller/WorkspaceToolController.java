@@ -365,12 +365,7 @@ public class WorkspaceToolController {
             @PathVariable Long id, @RequestBody CropRequest req,
             @AuthenticationPrincipal User user) throws IOException {
         Document source = loadOwned(id, user);
-        float top = req.marginTop() != null ? req.marginTop() : 0;
-        float right = req.marginRight() != null ? req.marginRight() : 0;
-        float bottom = req.marginBottom() != null ? req.marginBottom() : 0;
-        float left = req.marginLeft() != null ? req.marginLeft() : 0;
-        byte[] result = cropService.cropPages(prepareBytes(source, req.sourcePassword()),
-                top, right, bottom, left, req.pages());
+        byte[] result = cropService.cropPages(prepareBytes(source, req.sourcePassword()), req);
         Document out = storageService.storeProcessed(result, baseName(source.getOriginalName()) + "_cropped.pdf", "application/pdf", user);
         return ResponseEntity.ok(DocumentResponse.from(out));
     }

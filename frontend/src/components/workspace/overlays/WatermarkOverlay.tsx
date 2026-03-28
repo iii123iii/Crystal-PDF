@@ -8,27 +8,63 @@ interface Props {
   position: string
 }
 
+// Backend uses 50pt fixed margin on a standard page (595×842pt).
+// Convert to CSS pixels relative to actual rendered page size.
+const BACKEND_MARGIN_X_PT = 50
+const BACKEND_MARGIN_Y_PT = 50
+const BACKEND_PAGE_W_PT   = 595
+const BACKEND_PAGE_H_PT   = 842
+
 export default function WatermarkOverlay({ pageWidth, pageHeight, text, fontSize, opacity, rotation, position }: Props) {
   if (!text.trim()) return null
 
-  // Scale font size relative to page
-  const scaledFontSize = fontSize * (pageWidth / 595) // 595 is standard A4 width in points
+  // Scale font size exactly as the backend does (backend uses fontSize in PDF points)
+  const scaledFontSize = fontSize * (pageWidth / BACKEND_PAGE_W_PT)
 
-  const positionStyles: React.CSSProperties = (() => {
+  // Margins in CSS pixels — match the 50pt backend constant
+  const mX = (BACKEND_MARGIN_X_PT / BACKEND_PAGE_W_PT) * pageWidth
+  const mY = (BACKEND_MARGIN_Y_PT / BACKEND_PAGE_H_PT) * pageHeight
+
+  // Each corner position mirrors the backend anchor point and rotation origin.
+  // Backend rotates text around (cx, cy) which is the text-start anchor.
+  // We set transform-origin to match that anchor on the CSS element.
+  const positionStyle = ((): React.CSSProperties => {
     switch (position) {
       case 'top-left':
-        return { top: '10%', left: '10%', transform: `rotate(${rotation}deg)` }
+        return {
+          left: mX,
+          top: mY,
+          transformOrigin: 'left top',
+          transform: `rotate(${rotation}deg)`,
+        }
       case 'top-right':
-        return { top: '10%', right: '10%', transform: `rotate(${rotation}deg)` }
+        return {
+          right: mX,
+          top: mY,
+          transformOrigin: 'right top',
+          transform: `rotate(${rotation}deg)`,
+        }
       case 'bottom-left':
-        return { bottom: '10%', left: '10%', transform: `rotate(${rotation}deg)` }
+        return {
+          left: mX,
+          bottom: mY,
+          transformOrigin: 'left bottom',
+          transform: `rotate(${rotation}deg)`,
+        }
       case 'bottom-right':
-        return { bottom: '10%', right: '10%', transform: `rotate(${rotation}deg)` }
+        return {
+          right: mX,
+          bottom: mY,
+          transformOrigin: 'right bottom',
+          transform: `rotate(${rotation}deg)`,
+        }
       case 'center':
       default:
+        // Backend: cx = (W - textWidth)/2, cy = H/2 — centers horizontally and vertically
         return {
-          top: '50%',
           left: '50%',
+          top: '50%',
+          transformOrigin: 'center center',
           transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
         }
     }
@@ -39,19 +75,20 @@ export default function WatermarkOverlay({ pageWidth, pageHeight, text, fontSize
       <div
         style={{
           position: 'absolute',
-          ...positionStyles,
+          ...positionStyle,
           color: '#888',
           fontSize: scaledFontSize,
+          fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: 700,
           opacity,
           whiteSpace: 'nowrap',
           userSelect: 'none',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
-          // Dashed border to show it's a preview
-          padding: '4px 12px',
-          border: '2px dashed rgba(59, 130, 246, 0.5)',
-          borderRadius: 4,
+          // Dashed border to indicate preview
+          padding: '3px 8px',
+          border: '1.5px dashed rgba(59, 130, 246, 0.6)',
+          borderRadius: 3,
           background: 'rgba(59, 130, 246, 0.05)',
         }}
       >

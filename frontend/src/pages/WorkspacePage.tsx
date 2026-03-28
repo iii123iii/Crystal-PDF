@@ -41,6 +41,7 @@ import type { RedactArea } from '../components/workspace/overlays/RedactOverlay'
 import RedactPreviewOverlay from '../components/workspace/overlays/RedactPreviewOverlay'
 import WatermarkOverlay from '../components/workspace/overlays/WatermarkOverlay'
 import CropOverlay from '../components/workspace/overlays/CropOverlay'
+import PageNumberOverlay from '../components/workspace/overlays/PageNumberOverlay'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 
@@ -83,11 +84,29 @@ export default function WorkspacePage() {
   const [wmRotation, setWmRotation] = useState(-45)
   const [wmPosition, setWmPosition] = useState('center')
 
-  // Crop state (lifted for visual handles)
-  const [cropTop, setCropTop]       = useState(36)
-  const [cropRight, setCropRight]   = useState(36)
-  const [cropBottom, setCropBottom] = useState(36)
-  const [cropLeft, setCropLeft]     = useState(36)
+  // Crop state: per-page margins keyed by 1-based page number
+  const [pageCrops, setPageCrops] = useState<Map<number, { top: number; right: number; bottom: number; left: number }>>(new Map())
+
+  function getPageCrop(page: number) {
+    return pageCrops.get(page) ?? { top: 36, right: 36, bottom: 36, left: 36 }
+  }
+
+  function setPageCrop(page: number, crop: { top: number; right: number; bottom: number; left: number }) {
+    setPageCrops(prev => new Map(prev).set(page, crop))
+  }
+
+  function applyAllPages(crop: { top: number; right: number; bottom: number; left: number }) {
+    if (!pdfDoc) return
+    const next = new Map<number, { top: number; right: number; bottom: number; left: number }>()
+    for (let p = 1; p <= pdfDoc.numPages; p++) next.set(p, { ...crop })
+    setPageCrops(next)
+  }
+
+  // Page number state (lifted for live preview)
+  const [pnPosition,    setPnPosition]    = useState('bottom-center')
+  const [pnStartNumber, setPnStartNumber] = useState(1)
+  const [pnFontSize,    setPnFontSize]    = useState(10)
+  const [pnFormat,      setPnFormat]      = useState('number')
 
   // Annotation state
   const annotations = useAnnotations()
@@ -437,23 +456,43 @@ export default function WorkspacePage() {
                           </>
                         )
                     : activeTool === 'crop'
-                      ? (_pageNum, w, h) => (
+                      ? (pageNum, w, h) => {
+                          const crop = getPageCrop(pageNum)
+                          return (
+                            <>
+                              {redactAreas.length > 0 && (
+                                <RedactPreviewOverlay pageNum={pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
+                              )}
+                              <CropOverlay
+                                pageWidth={w}
+                                pageHeight={h}
+                                top={crop.top}
+                                right={crop.right}
+                                bottom={crop.bottom}
+                                left={crop.left}
+                                onTopChange={v => setPageCrop(pageNum, { ...crop, top: v })}
+                                onRightChange={v => setPageCrop(pageNum, { ...crop, right: v })}
+                                onBottomChange={v => setPageCrop(pageNum, { ...crop, bottom: v })}
+                                onLeftChange={v => setPageCrop(pageNum, { ...crop, left: v })}
+                              />
+                            </>
+                          )
+                        }
+                    : activeTool === 'page-numbers'
+                      ? (pageNum, w, h) => (
                           <>
-                            {/* Redactions as background overlay (read-only) */}
                             {redactAreas.length > 0 && (
-                              <RedactPreviewOverlay pageNum={_pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
+                              <RedactPreviewOverlay pageNum={pageNum} pageWidth={w} pageHeight={h} areas={redactAreas} />
                             )}
-                            <CropOverlay
+                            <PageNumberOverlay
+                              pageNum={pageNum}
+                              totalPages={pdfDoc!.numPages}
                               pageWidth={w}
                               pageHeight={h}
-                              top={cropTop}
-                              right={cropRight}
-                              bottom={cropBottom}
-                              left={cropLeft}
-                              onTopChange={setCropTop}
-                              onRightChange={setCropRight}
-                              onBottomChange={setCropBottom}
-                              onLeftChange={setCropLeft}
+                              position={pnPosition}
+                              startNumber={pnStartNumber}
+                              fontSize={pnFontSize}
+                              format={pnFormat}
                             />
                           </>
                         )
@@ -551,7 +590,14 @@ export default function WorkspacePage() {
               />
             )}
             {activeTool === 'page-numbers' && id && (
-              <PageNumberPanel docId={id} pdfPassword={pdfPassword} onSuccess={handleToolSuccess} />
+              <PageNumberPanel
+                docId={id} pdfPassword={pdfPassword}
+                position={pnPosition} startNumber={pnStartNumber}
+                fontSize={pnFontSize} format={pnFormat}
+                onPositionChange={setPnPosition} onStartNumberChange={setPnStartNumber}
+                onFontSizeChange={setPnFontSize} onFormatChange={setPnFormat}
+                onSuccess={handleToolSuccess}
+              />
             )}
             {activeTool === 'extract-text' && id && (
               <ExtractTextPanel docId={id} pdfPassword={pdfPassword} />
@@ -559,12 +605,15 @@ export default function WorkspacePage() {
             {activeTool === 'extract-images' && id && (
               <ExtractImagesPanel docId={id} pdfPassword={pdfPassword} />
             )}
-            {activeTool === 'crop' && id && (
+            {activeTool === 'crop' && id && pdfDoc && (
               <CropPanel
                 docId={id} pdfPassword={pdfPassword}
-                top={cropTop} right={cropRight} bottom={cropBottom} left={cropLeft}
-                onTopChange={setCropTop} onRightChange={setCropRight}
-                onBottomChange={setCropBottom} onLeftChange={setCropLeft}
+                currentPage={currentPage}
+                totalPages={pdfDoc.numPages}
+                pageCrops={pageCrops}
+                getPageCrop={getPageCrop}
+                onPageCropChange={setPageCrop}
+                onApplyAll={applyAllPages}
                 onSuccess={handleToolSuccess}
               />
             )}

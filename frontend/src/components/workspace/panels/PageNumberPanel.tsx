@@ -6,14 +6,23 @@ import { useToastStore } from '../../../store/useToastStore'
 interface Props {
   docId: string
   pdfPassword: string | null
+  position: string
+  startNumber: number
+  fontSize: number
+  format: string
+  onPositionChange: (v: string) => void
+  onStartNumberChange: (v: number) => void
+  onFontSizeChange: (v: number) => void
+  onFormatChange: (v: string) => void
   onSuccess: (doc: { id: number; originalName: string }) => void
 }
 
-export default function PageNumberPanel({ docId, pdfPassword, onSuccess }: Props) {
-  const [position, setPosition] = useState('bottom-center')
-  const [startNumber, setStartNumber] = useState(1)
-  const [fontSize, setFontSize] = useState(10)
-  const [format, setFormat] = useState('number')
+export default function PageNumberPanel({
+  docId, pdfPassword,
+  position, startNumber, fontSize, format,
+  onPositionChange, onStartNumberChange, onFontSizeChange, onFormatChange,
+  onSuccess,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const addToast = useToastStore(s => s.addToast)
 
@@ -31,13 +40,21 @@ export default function PageNumberPanel({ docId, pdfPassword, onSuccess }: Props
     finally { setLoading(false) }
   }
 
-  const selectStyle: React.CSSProperties = { background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-text)', outline: 'none' }
+  const selectStyle: React.CSSProperties = {
+    background: 'var(--color-surface-2)',
+    border: '1px solid var(--color-border)',
+    color: 'var(--color-text)',
+    outline: 'none',
+  }
 
   return (
     <div className="p-4 space-y-4">
+      <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+        Preview updates live on the PDF as you change settings.
+      </p>
       <div>
         <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--color-muted)' }}>Position</label>
-        <select value={position} onChange={e => setPosition(e.target.value)} className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle}>
+        <select value={position} onChange={e => onPositionChange(e.target.value)} className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle}>
           <option value="bottom-center">Bottom Center</option>
           <option value="bottom-left">Bottom Left</option>
           <option value="bottom-right">Bottom Right</option>
@@ -48,7 +65,7 @@ export default function PageNumberPanel({ docId, pdfPassword, onSuccess }: Props
       </div>
       <div>
         <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--color-muted)' }}>Format</label>
-        <select value={format} onChange={e => setFormat(e.target.value)} className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle}>
+        <select value={format} onChange={e => onFormatChange(e.target.value)} className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle}>
           <option value="number">1, 2, 3...</option>
           <option value="page-number">Page 1, Page 2...</option>
           <option value="number-of-total">1 of 10, 2 of 10...</option>
@@ -58,12 +75,12 @@ export default function PageNumberPanel({ docId, pdfPassword, onSuccess }: Props
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--color-muted)' }}>Start From</label>
-          <input type="number" value={startNumber} onChange={e => setStartNumber(+e.target.value)} min={1}
+          <input type="number" value={startNumber} onChange={e => onStartNumberChange(Math.max(1, +e.target.value))} min={1}
             className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle} />
         </div>
         <div>
           <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--color-muted)' }}>Font Size</label>
-          <input type="number" value={fontSize} onChange={e => setFontSize(+e.target.value)} min={6} max={36}
+          <input type="number" value={fontSize} onChange={e => onFontSizeChange(Math.max(6, Math.min(36, +e.target.value)))} min={6} max={36}
             className="w-full text-sm px-3 py-2 rounded-lg" style={selectStyle} />
         </div>
       </div>
