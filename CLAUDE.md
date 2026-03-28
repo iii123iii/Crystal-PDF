@@ -17,10 +17,39 @@ export JAVA_HOME="C:\Users\omrio\scoop\apps\openjdk21\21.0.2-13"  # Windows exam
 cd backend
 ./gradlew bootRun       # Run backend (port 8080)
 ./gradlew build         # Build
-./gradlew test          # Run all tests
-./gradlew test --tests "com.crystalpdf.backend.SomeTest"  # Run single test
+./gradlew test          # Run all tests (no DB required — unit tests only)
+./gradlew test --tests "com.crystalpdf.backend.service.WatermarkServiceTest"  # Single test class
+./gradlew test --tests "com.crystalpdf.backend.service.*"  # All service tests
 ./gradlew clean
 ```
+
+### Testing Strategy
+
+All tests are **unit tests** and run without any external services (no DB, no server needed).
+
+**Backend test coverage** (`backend/src/test/`):
+- `helper/PdfTestHelper` — Creates minimal valid PDFs in memory for use by all PDF tests
+- `service/JwtServiceTest` — Token generation, extraction, validation, expiry
+- `service/FileEncryptionServiceTest` — AES-GCM encrypt/decrypt round-trips
+- `service/AuthServiceTest` — Register, login, changePassword, deleteAccount (all with Mockito mocks)
+- `service/StorageServiceTest` — store (PDF validation, size limits, sanitize), load, delete (uses `@TempDir`)
+- `service/MergeServiceTest` — Merge 2–3 PDFs, error cases
+- `service/SplitServiceTest` — Extract pages, out-of-range handling
+- `service/RotateServiceTest` — Rotate 90/180/270, multi-page, accumulation
+- `service/DeletePagesServiceTest` — Delete pages, prevent deleting all pages
+- `service/WatermarkServiceTest` — All 5 positions, rotation variants
+- `service/PageNumberServiceTest` — All 6 positions, all 4 formats
+
+**Frontend test coverage** (`frontend/src/`):
+- `store/useAppStore.test.ts` — activeTool, auth (setAuth/clearAuth), theme toggle
+- `store/useToastStore.test.ts` — addToast, removeToast, auto-dismiss after 6s
+- `lib/api.test.ts` — apiFetch: successful responses, 401 handling, redirect suppression on /login
+- `overlays/WatermarkOverlay.test.tsx` — Rendering, scaling, rotation negation, all positions
+- `overlays/PageNumberOverlay.test.tsx` — All formats, startNumber offset, scaling, all positions
+
+**Test setup files:**
+- `frontend/vitest.config.ts` — Vitest config (jsdom environment, global APIs)
+- `frontend/src/test/setup.ts` — Imports `@testing-library/jest-dom` matchers
 
 ### Frontend (React + Vite + TypeScript + Tailwind)
 
@@ -30,6 +59,9 @@ npm install
 npm run dev             # Dev server (port 5173)
 npm run build
 npm run preview
+npm test                # Run all tests (Vitest, no server needed)
+npm run test:watch      # Run tests in watch mode
+npm run test:ui         # Open Vitest UI in browser
 ```
 
 ### Database (PostgreSQL)

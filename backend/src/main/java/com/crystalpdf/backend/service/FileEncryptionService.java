@@ -15,8 +15,8 @@ public class FileEncryptionService {
     private static final int IV_LENGTH_BYTES = 12;
     private static final int GCM_TAG_BITS = 128;
 
-    // Fallback dev key: 32-byte hex string (AES-256)
-    private static final String DEV_KEY_HEX = "6372797374616c706466656e637279707431323334353637383930616263646566";
+    // Fallback dev key: 32-byte hex string (AES-256)  — "crystalpdfencrypt1234567890abcde"
+    private static final String DEV_KEY_HEX = "6372797374616c706466656e6372797074313233343536373839306162636465";
 
     private final byte[] keyBytes;
 

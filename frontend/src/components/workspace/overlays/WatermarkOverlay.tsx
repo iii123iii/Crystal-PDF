@@ -35,28 +35,28 @@ export default function WatermarkOverlay({ pageWidth, pageHeight, text, fontSize
           left: mX,
           top: mY,
           transformOrigin: 'left top',
-          transform: `rotate(${rotation}deg)`,
+          transform: `rotate(${-rotation}deg)`,
         }
       case 'top-right':
         return {
           right: mX,
           top: mY,
           transformOrigin: 'right top',
-          transform: `rotate(${rotation}deg)`,
+          transform: `rotate(${-rotation}deg)`,
         }
       case 'bottom-left':
         return {
           left: mX,
           bottom: mY,
           transformOrigin: 'left bottom',
-          transform: `rotate(${rotation}deg)`,
+          transform: `rotate(${-rotation}deg)`,
         }
       case 'bottom-right':
         return {
           right: mX,
           bottom: mY,
           transformOrigin: 'right bottom',
-          transform: `rotate(${rotation}deg)`,
+          transform: `rotate(${-rotation}deg)`,
         }
       case 'center':
       default:
@@ -65,7 +65,7 @@ export default function WatermarkOverlay({ pageWidth, pageHeight, text, fontSize
           left: '50%',
           top: '50%',
           transformOrigin: 'center center',
-          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+          transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
         }
     }
   })()

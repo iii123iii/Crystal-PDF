@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Sun,
   Moon,
-  LayoutGrid,
   ShieldCheck,
 } from 'lucide-react'
 import { useAppStore } from '../../store/useAppStore'
@@ -81,29 +80,6 @@ export default function Sidebar() {
           {isDark ? <Sun size={14} /> : <Moon size={14} />}
         </button>
       </div>
-
-      {/* ── All Tools link ── */}
-      <div className="px-3 mb-1">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
-              isActive
-                ? 'text-[var(--color-text)] bg-[var(--color-surface-2)]'
-                : 'text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]'
-            }`
-          }
-          end
-        >
-          <LayoutGrid size={14} />
-          All Tools
-        </NavLink>
-      </div>
-
-      <div
-        className="mx-3 mb-3"
-        style={{ height: '1px', background: 'var(--color-border)' }}
-      />
 
       {/* ── Tool categories ── */}
       <nav className="flex-1 px-3 space-y-0.5">

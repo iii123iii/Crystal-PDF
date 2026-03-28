@@ -11,7 +11,6 @@ import AdminDashboard from './components/admin/AdminDashboard'
 import AdminUsersPage from './components/admin/AdminUsersPage'
 import AdminSettingsPage from './components/admin/AdminSettingsPage'
 import DashboardLayout from './components/layout/DashboardLayout'
-import Dashboard from './components/dashboard/Dashboard'
 import MyFiles from './components/dashboard/MyFiles'
 import SettingsView from './components/layout/SettingsView'
 import ToastContainer from './components/ui/ToastContainer'
@@ -57,7 +56,7 @@ export default function App() {
             </AuthGuard>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<MyFiles />} />
           <Route path="/dashboard/files" element={<MyFiles />} />
           <Route path="/settings" element={<SettingsView />} />
         </Route>

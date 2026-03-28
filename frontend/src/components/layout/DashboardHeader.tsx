@@ -3,8 +3,7 @@ import { Sun, Moon, ShieldCheck, LogOut } from 'lucide-react'
 import { useAppStore } from '../../store/useAppStore'
 
 const tabs = [
-  { label: 'All Tools', to: '/dashboard' },
-  { label: 'My Files', to: '/dashboard/files' },
+  { label: 'My Files', to: '/dashboard' },
   { label: 'Settings', to: '/settings' },
 ]
 
