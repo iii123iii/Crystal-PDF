@@ -34,3 +34,8 @@ crystalpdf:
     # REQUIRED: set JWT_SECRET env var in production. The default is for local dev only.
     secret: ${JWT_SECRET:Y3J5c3RhbHBkZi12Mi1qd3Qtc2VjcmV0LWtleS1wbGVhc2UtY2hhbmdlLWluLXByb2R1Y3Rpb24=}
     expiration-ms: 86400000  # 24 hours
+  cors:
+    # Comma-separated list of allowed origins for CORS.
+    # REQUIRED: set CORS_ALLOWED_ORIGINS env var in production to your frontend domain(s).
+    # Example: https://example.com,https://api.example.com
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

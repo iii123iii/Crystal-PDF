@@ -14,10 +14,12 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import MyFiles from './components/dashboard/MyFiles'
 import SettingsView from './components/layout/SettingsView'
 import ToastContainer from './components/ui/ToastContainer'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -62,6 +64,7 @@ export default function App() {
         </Route>
       </Routes>
       <ToastContainer />
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

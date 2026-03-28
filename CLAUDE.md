@@ -154,6 +154,33 @@ com.crystalpdf.backend
 | `DB_PASSWORD` | `postgres` | DB password |
 | `STORAGE_PATH` | `./storage` | Disk path for uploaded PDFs |
 | `JWT_SECRET` | (dev default in yml) | Base64-encoded JWT signing key |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated CORS origins (e.g., `https://example.com,https://api.example.com`) |
+
+### Security Features
+
+**Rate Limiting:**
+- Login/register endpoints limited to 10 attempts per 15 minutes per IP
+- `RateLimitFilter` tracks attempts in-memory; for production, integrate Redis and external rate-limiting service
+- Checks `X-Forwarded-For` header for proxied requests
+
+**Default Credentials:**
+- Auto-generated admin user: email=`admin@example.com`, password=`AdminChangeMe123!`
+- **MUST be changed immediately after first deployment**
+- No auto-reset mechanism (prevents privilege escalation if password is forgotten)
+
+**CORS:**
+- Origins configurable via `CORS_ALLOWED_ORIGINS` env var
+- Supports multiple origins (comma-separated)
+- Credentials flag enabled for cookie-based auth
+
+**Request Cancellation (Frontend):**
+- Use `createAbortController()` utility to cancel pending API requests on component unmount
+- Prevents memory leaks and state updates on unmounted components
+
+**Error Boundaries (Frontend):**
+- `ErrorBoundary` component catches React errors and prevents app crashes
+- Shows user-friendly error message with retry button
+- Wrap critical components or use at app root level
 
 ### System Dependencies (required in production/Docker)
 

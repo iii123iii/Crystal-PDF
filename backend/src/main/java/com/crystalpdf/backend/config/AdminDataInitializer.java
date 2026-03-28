@@ -15,25 +15,20 @@ public class AdminDataInitializer {
     @Bean
     ApplicationRunner seedAdmin(UserRepository userRepo, PasswordEncoder encoder, AppSettingsRepository settingsRepo) {
         return args -> {
-            // Create admin user if no admin exists
+            // Create admin user only if no admin exists.
+            // Once created, admin password is not auto-reset (prevent privilege escalation).
+            // To recover a lost admin password, manually set a new one via database or admin console.
             boolean adminExists = userRepo.findAll().stream().anyMatch(User::isAdmin);
             if (!adminExists) {
                 User admin = new User();
-                admin.setEmail("admin");
+                admin.setEmail("admin@example.com");
                 admin.setDisplayUsername("admin");
-                admin.setPassword(encoder.encode("admin"));
+                // IMPORTANT: Change this password immediately after first deployment!
+                admin.setPassword(encoder.encode("AdminChangeMe123!"));
                 admin.setAdmin(true);
                 admin.setPasswordChangeRequired(true);
                 userRepo.save(admin);
-            } else {
-                // If admin exists and is locked out (passwordChangeRequired + unknown password),
-                // reset to default credentials so they can log back in
-                userRepo.findByEmail("admin").ifPresent(admin -> {
-                    if (admin.isAdmin() && admin.isPasswordChangeRequired()) {
-                        admin.setPassword(encoder.encode("admin"));
-                        userRepo.save(admin);
-                    }
-                });
+                System.out.println("⚠️  Default admin created: email=admin@example.com, password=AdminChangeMe123! (CHANGE IMMEDIATELY)");
             }
             // Create default settings singleton if not exists
             if (!settingsRepo.existsById(1L)) {
