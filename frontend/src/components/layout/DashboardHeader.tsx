@@ -26,7 +26,7 @@ export default function DashboardHeader() {
 
   return (
     <header
-      className="shrink-0 flex items-center px-5 border-b select-none"
+      className="shrink-0 flex items-center px-4 sm:px-5 border-b select-none"
       style={{
         height: 56,
         background: 'var(--color-surface)',
@@ -34,7 +34,7 @@ export default function DashboardHeader() {
       }}
     >
       {/* ── Logo ── */}
-      <NavLink to="/dashboard" className="flex items-center gap-2.5 mr-8">
+      <NavLink to="/dashboard" className="flex items-center gap-2 sm:gap-2.5 mr-4 sm:mr-8 shrink-0">
         <div
           className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
           style={{ background: 'var(--color-accent)', opacity: 0.9 }}
@@ -56,7 +56,7 @@ export default function DashboardHeader() {
             key={to}
             to={to}
             end={to === '/dashboard'}
-            className="relative h-full flex items-center px-3 text-sm font-medium transition-colors"
+            className="relative h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm font-medium transition-colors"
             style={({ isActive }) => ({
               color: isActive ? 'var(--color-accent)' : 'var(--color-muted)',
             })}
@@ -66,7 +66,7 @@ export default function DashboardHeader() {
                 {label}
                 {isActive && (
                   <span
-                    className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full"
+                    className="absolute bottom-0 left-2 right-2 sm:left-3 sm:right-3 h-[2px] rounded-full"
                     style={{ background: 'var(--color-accent)' }}
                   />
                 )}
@@ -80,7 +80,7 @@ export default function DashboardHeader() {
       <div className="flex-1" />
 
       {/* ── Right controls ── */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
@@ -103,7 +103,7 @@ export default function DashboardHeader() {
         {isAdmin && (
           <NavLink
             to="/admin"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors"
             style={{ color: '#f59e0b' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(245,158,11,0.1)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -114,17 +114,17 @@ export default function DashboardHeader() {
         )}
 
         {/* Separator */}
-        <div className="w-px h-5" style={{ background: 'var(--color-border)' }} />
+        <div className="hidden sm:block w-px h-5" style={{ background: 'var(--color-border)' }} />
 
         {/* User avatar + email */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
             style={{ background: 'var(--color-accent-muted)', color: 'var(--color-accent)' }}
           >
             {initial}
           </div>
-          <span className="text-xs max-w-[140px] truncate" style={{ color: 'var(--color-muted)' }}>
+          <span className="hidden sm:inline text-xs max-w-[120px] truncate" style={{ color: 'var(--color-muted)' }}>
             {userEmail}
           </span>
         </div>

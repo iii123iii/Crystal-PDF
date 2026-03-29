@@ -62,7 +62,7 @@ export default function Dashboard() {
     : toolCategories
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-8 w-full">
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-8 w-full">
 
       {/* ── Hero upload zone ── */}
       <div
@@ -70,7 +70,7 @@ export default function Dashboard() {
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); uploadAndOpen(e.dataTransfer.files) }}
         onClick={() => { setPendingTool(null); inputRef.current?.click() }}
-        className="mb-8 flex flex-col items-center justify-center gap-3 rounded-xl p-10 cursor-pointer transition-all"
+        className="mb-8 flex flex-col items-center justify-center gap-3 rounded-xl p-6 sm:p-10 cursor-pointer transition-all"
         style={{
           border: `2px dashed ${dragging ? 'var(--color-accent)' : 'var(--color-border)'}`,
           background: dragging ? 'var(--color-accent-muted)' : 'var(--color-surface)',

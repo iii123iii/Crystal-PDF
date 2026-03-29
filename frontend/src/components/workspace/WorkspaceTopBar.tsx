@@ -64,7 +64,7 @@ export default function WorkspaceTopBar({
 
   return (
     <header
-      className="shrink-0 flex items-center px-3 select-none"
+      className="shrink-0 flex items-center px-3 select-none gap-1"
       style={{
         height: 52,
         background: 'var(--color-surface)',
@@ -73,7 +73,7 @@ export default function WorkspaceTopBar({
       }}
     >
       {/* ── LEFT: Back, name, page badge ── */}
-      <div className="flex items-center gap-2 min-w-0 mr-4">
+      <div className="flex items-center gap-2 min-w-0 flex-1 md:flex-none md:mr-4">
         <button
           onClick={onBack}
           className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors"
@@ -91,12 +91,12 @@ export default function WorkspaceTopBar({
           <ArrowLeft size={16} />
         </button>
 
-        <div className="w-px h-5 shrink-0" style={{ background: 'var(--color-border)' }} />
+        <div className="hidden sm:block w-px h-5 shrink-0" style={{ background: 'var(--color-border)' }} />
 
         {/* Document name */}
         {renaming ? (
           <form
-            className="flex items-center gap-1.5 min-w-0 max-w-[240px]"
+            className="flex items-center gap-1.5 min-w-0 max-w-[140px] sm:max-w-[240px]"
             onSubmit={(e) => { e.preventDefault(); onRenameSubmit() }}
           >
             <input
@@ -114,7 +114,7 @@ export default function WorkspaceTopBar({
           </form>
         ) : (
           <span
-            className="text-sm font-medium truncate max-w-[220px] cursor-pointer transition-colors"
+            className="text-sm font-medium truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px] cursor-pointer transition-colors"
             style={{ color: 'var(--color-text)' }}
             onClick={onRenameStart}
             title="Click to rename"
@@ -123,10 +123,10 @@ export default function WorkspaceTopBar({
           </span>
         )}
 
-        {/* Page count badge */}
+        {/* Page count badge — hidden on mobile */}
         {totalPages > 0 && (
           <span
-            className="text-xs font-mono px-2 py-0.5 rounded shrink-0"
+            className="hidden sm:inline text-xs font-mono px-2 py-0.5 rounded shrink-0"
             style={{ background: 'var(--color-surface-2)', color: 'var(--color-muted)' }}
           >
             {totalPages} pg{totalPages !== 1 ? 's' : ''}
@@ -134,8 +134,8 @@ export default function WorkspaceTopBar({
         )}
       </div>
 
-      {/* ── CENTER: Page nav + Zoom ── */}
-      <div className="flex-1 flex items-center justify-center gap-3">
+      {/* ── CENTER: Page nav + Zoom — hidden on mobile ── */}
+      <div className="hidden md:flex flex-1 items-center justify-center gap-3">
         {/* Page navigation */}
         {totalPages > 0 && (
           <div className="flex items-center gap-1">
@@ -237,33 +237,53 @@ export default function WorkspaceTopBar({
       </div>
 
       {/* ── RIGHT: View toggles + Download ── */}
-      <div className="flex items-center gap-1.5 ml-4">
-        {/* View toggle buttons */}
-        {[
-          { icon: LayoutGrid, active: showThumbnails, onClick: onToggleThumbnails, title: 'Page thumbnails' },
-          { icon: Grid3x3, active: showOrganizer, onClick: onToggleOrganizer, title: 'Page organizer' },
-          { icon: PanelRight, active: showToolPanel, onClick: onToggleToolPanel, title: 'Tool panel' },
-        ].map(({ icon: Icon, active, onClick, title }) => (
-          <button
-            key={title}
-            onClick={onClick}
-            disabled={totalPages === 0}
-            title={title}
-            className="w-8 h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-30"
-            style={{
-              color: active ? 'var(--color-accent)' : 'var(--color-muted)',
-              background: active ? 'var(--color-accent-muted)' : 'transparent',
-            }}
-            onMouseEnter={(e) => {
-              if (!active) e.currentTarget.style.background = 'var(--color-surface-2)'
-            }}
-            onMouseLeave={(e) => {
-              if (!active) e.currentTarget.style.background = 'transparent'
-            }}
-          >
-            <Icon size={15} />
-          </button>
-        ))}
+      <div className="flex items-center gap-1 md:gap-1.5 md:ml-4 shrink-0">
+        {/* Thumbnail + organizer toggles — desktop only */}
+        <button
+          onClick={onToggleThumbnails}
+          disabled={totalPages === 0}
+          title="Page thumbnails"
+          className="hidden md:flex w-8 h-8 rounded-md items-center justify-center transition-colors disabled:opacity-30"
+          style={{
+            color: showThumbnails ? 'var(--color-accent)' : 'var(--color-muted)',
+            background: showThumbnails ? 'var(--color-accent-muted)' : 'transparent',
+          }}
+          onMouseEnter={(e) => { if (!showThumbnails) e.currentTarget.style.background = 'var(--color-surface-2)' }}
+          onMouseLeave={(e) => { if (!showThumbnails) e.currentTarget.style.background = 'transparent' }}
+        >
+          <LayoutGrid size={15} />
+        </button>
+
+        <button
+          onClick={onToggleOrganizer}
+          disabled={totalPages === 0}
+          title="Page organizer"
+          className="hidden md:flex w-8 h-8 rounded-md items-center justify-center transition-colors disabled:opacity-30"
+          style={{
+            color: showOrganizer ? 'var(--color-accent)' : 'var(--color-muted)',
+            background: showOrganizer ? 'var(--color-accent-muted)' : 'transparent',
+          }}
+          onMouseEnter={(e) => { if (!showOrganizer) e.currentTarget.style.background = 'var(--color-surface-2)' }}
+          onMouseLeave={(e) => { if (!showOrganizer) e.currentTarget.style.background = 'transparent' }}
+        >
+          <Grid3x3 size={15} />
+        </button>
+
+        {/* Tool panel toggle — always visible */}
+        <button
+          onClick={onToggleToolPanel}
+          disabled={totalPages === 0}
+          title="Tool panel"
+          className="w-8 h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-30"
+          style={{
+            color: showToolPanel ? 'var(--color-accent)' : 'var(--color-muted)',
+            background: showToolPanel ? 'var(--color-accent-muted)' : 'transparent',
+          }}
+          onMouseEnter={(e) => { if (!showToolPanel) e.currentTarget.style.background = 'var(--color-surface-2)' }}
+          onMouseLeave={(e) => { if (!showToolPanel) e.currentTarget.style.background = 'transparent' }}
+        >
+          <PanelRight size={15} />
+        </button>
 
         <div className="w-px h-5" style={{ background: 'var(--color-border)' }} />
 
@@ -271,12 +291,12 @@ export default function WorkspaceTopBar({
         <button
           onClick={onDownload}
           disabled={!docName}
-          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-40 shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 text-xs font-medium px-2 sm:px-3 py-1.5 rounded-md transition-colors disabled:opacity-40 shrink-0"
           style={{ background: 'var(--color-accent)', color: '#fff' }}
           title="Download PDF"
         >
           <Download size={13} />
-          <span>Download</span>
+          <span className="hidden sm:inline">Download</span>
         </button>
       </div>
     </header>

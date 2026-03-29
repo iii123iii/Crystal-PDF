@@ -63,14 +63,14 @@ export default function WorkspacePage() {
   const [pdfDoc, setPdfDoc]         = useState<pdfjsLib.PDFDocumentProxy | null>(null)
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState<string | null>(null)
-  const [scale, setScale]           = useState(1.2)
+  const [scale, setScale]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 768 ? 0.7 : 1.2)
   const [currentPage, setCurrentPage] = useState(1)
 
   const initialTool = (location.state as { activeTool?: string } | null)?.activeTool ?? null
   const [activeTool, setActiveTool] = useState<string | null>(initialTool)
 
   const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set())
-  const [showThumbnails, setShowThumbnails] = useState(true)
+  const [showThumbnails, setShowThumbnails] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : true)
   const [showOrganizer, setShowOrganizer]   = useState(false)
   const [showToolPanel, setShowToolPanel]   = useState(true)
 
