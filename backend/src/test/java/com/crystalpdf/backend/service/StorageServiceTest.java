@@ -18,7 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +60,7 @@ class StorageServiceTest {
         return s;
     }
 
-    // ── store ─────────────────────────────────────────────────────────────────
+    // ?? store ?????????????????????????????????????????????????????????????????
 
     @Test
     void store_acceptsValidPdf() throws Exception {
@@ -70,7 +69,7 @@ class StorageServiceTest {
                 "file", "test.pdf", "application/pdf", pdfBytes);
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(owner.getId())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -87,7 +86,7 @@ class StorageServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "malicious.pdf", "application/pdf", notPdf);
 
-        // PDF magic-byte check happens before any repository call — no stubs needed
+        // PDF magic-byte check happens before any repository call - no stubs needed
         assertThatThrownBy(() -> storageService.store(file, owner))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Only PDF files");
@@ -96,7 +95,7 @@ class StorageServiceTest {
     @Test
     void store_rejectsFileExceedingUploadLimit() throws Exception {
         AppSettings tinyLimit = new AppSettings();
-        tinyLimit.setMaxUploadSizeMb(0); // effectively 0 bytes — any PDF will exceed this
+        tinyLimit.setMaxUploadSizeMb(0); // effectively 0 bytes - any PDF will exceed this
         tinyLimit.setDefaultStorageLimitMb(1024);
 
         byte[] pdfBytes = PdfTestHelper.createPdf(1);
@@ -118,7 +117,7 @@ class StorageServiceTest {
                 "file", "../../../etc/passwd.pdf", "application/pdf", pdfBytes);
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(owner.getId())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -134,7 +133,7 @@ class StorageServiceTest {
                 "file", "test.pdf", "text/plain", pdfBytes); // client sends wrong MIME
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(owner.getId())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -143,7 +142,7 @@ class StorageServiceTest {
         assertThat(doc.getMimeType()).isEqualTo("application/pdf");
     }
 
-    // ── storeProcessed / loadBytes ────────────────────────────────────────────
+    // ?? storeProcessed / loadBytes ????????????????????????????????????????????
 
     @Test
     void storeProcessed_thenLoadBytes_roundTrips() throws Exception {
@@ -166,7 +165,7 @@ class StorageServiceTest {
         assertThat(doc.getSizeBytes()).isEqualTo(pdfBytes.length);
     }
 
-    // ── deleteFile ────────────────────────────────────────────────────────────
+    // ?? deleteFile ????????????????????????????????????????????????????????????
 
     @Test
     void deleteFile_removesFileFromDisk() throws Exception {
@@ -190,21 +189,17 @@ class StorageServiceTest {
         storageService.deleteFile(doc);
     }
 
-    // ── getStorageInfo ────────────────────────────────────────────────────────
+    // ?? getStorageInfo ????????????????????????????????????????????????????????
 
     @Test
     void getStorageInfo_returnsUsedAndLimit() {
-        Document d1 = new Document();
-        d1.setSizeBytes(1024L);
-        Document d2 = new Document();
-        d2.setSizeBytes(2048L);
-
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(java.util.List.of(d1, d2));
+        when(documentRepository.sumSizeBytesByOwnerId(owner.getId())).thenReturn(3072L);
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
 
         long[] info = storageService.getStorageInfo(owner);
 
         assertThat(info[0]).isEqualTo(3072L);                        // used bytes
         assertThat(info[1]).isEqualTo(1024L * 1024L * 1024L);        // 1 GB default limit
+        verify(documentRepository, never()).findByOwnerIdOrderByCreatedAtDesc(any());
     }
 }
