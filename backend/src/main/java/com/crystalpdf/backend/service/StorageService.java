@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -71,8 +70,7 @@ public class StorageService {
         }
 
         // Check storage limit
-        List<Document> existingDocs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
-        long usedBytes = existingDocs.stream().mapToLong(Document::getSizeBytes).sum();
+        long usedBytes = documentRepository.sumSizeBytesByOwnerId(owner.getId());
         long limitBytes = owner.getStorageLimitBytes() != null ? owner.getStorageLimitBytes()
                 : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
         if (usedBytes + fileSizeBytes > limitBytes) {
@@ -101,7 +99,7 @@ public class StorageService {
         doc.setOwner(owner);
         doc.setOriginalName(originalName);
         doc.setStoredName(storedName);
-        doc.setMimeType("application/pdf");  // Always PDF — never trust client Content-Type
+        doc.setMimeType("application/pdf");  // Always PDF - never trust client Content-Type
         doc.setSizeBytes(originalSize);
         return documentRepository.save(doc);
     }
@@ -171,7 +169,7 @@ public class StorageService {
                     .resolve(doc.getStoredName());
             Files.deleteIfExists(filePath);
         } catch (IOException ignored) {
-            // Best-effort delete — DB record deletion proceeds regardless
+            // Best-effort delete - DB record deletion proceeds regardless
         }
     }
 
@@ -179,15 +177,14 @@ public class StorageService {
      * Returns the user's storage usage and limit in bytes.
      */
     public long[] getStorageInfo(User owner) {
-        List<Document> docs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
-        long usedBytes = docs.stream().mapToLong(Document::getSizeBytes).sum();
+        long usedBytes = documentRepository.sumSizeBytesByOwnerId(owner.getId());
         AppSettings settings = appSettingsRepository.findById(1L).orElse(new AppSettings());
         long limitBytes = owner.getStorageLimitBytes() != null ? owner.getStorageLimitBytes()
                 : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
         return new long[]{ usedBytes, limitBytes };
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // ?? Helpers ??????????????????????????????????????????????????????????????
 
     /** Reads the first few bytes of the upload for magic-byte validation. */
     private byte[] readHeader(MultipartFile file) throws IOException {
