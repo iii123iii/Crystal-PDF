@@ -29,7 +29,7 @@ const tools = [
 
 const steps = [
   { num: '01', icon: Upload, title: 'Upload', body: 'Drop any PDF into your workspace. Stored securely under your account.' },
-  { num: '02', icon: Wand2, title: 'Process', body: 'Pick a tool — merge, split, compress, protect, annotate, convert, and more.' },
+  { num: '02', icon: Wand2, title: 'Process', body: 'Pick a tool �?merge, split, compress, protect, annotate, convert, and more.' },
   { num: '03', icon: Download, title: 'Download', body: 'Every operation creates a new file. Your originals are never modified.' },
 ]
 
@@ -68,8 +68,7 @@ export default function LandingPage() {
 
         /* Crystal prism */
         .prism {
-          width: 340px;
-          height: 340px;
+          width: min(340px, 80vw); height: min(340px, 80vw);
           position: relative;
         }
         .prism::before {
@@ -133,7 +132,7 @@ export default function LandingPage() {
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[min(900px,100vw)] h-[min(900px,100vw)] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
         <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
@@ -169,8 +168,7 @@ export default function LandingPage() {
 
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+                          pt-14 pb-20 md:pt-32 md:pb-36 grid md:grid-cols-[1fr,auto] items-center gap-8 md:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -185,7 +183,7 @@ export default function LandingPage() {
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-8 md:mt-10 flex flex-wrap justify-center md:justify-start gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -204,7 +202,7 @@ export default function LandingPage() {
         </div>
 
         {/* Crystal visual */}
-        <div className="hidden md:flex items-center justify-center anim-fade anim-d4">
+        <div className="flex items-center justify-center mt-8 md:mt-0 anim-fade anim-d4">
           <div className="prism">
             {/* Inner facets */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -227,12 +225,12 @@ export default function LandingPage() {
               Everything in<br className="hidden sm:block" /> one workspace
             </h2>
             <p className="mt-4 text-slate-500 leading-relaxed text-[15px]">
-              Every operation produces a new file — your originals stay untouched.
+              Every operation produces a new file �?your originals stay untouched.
             </p>
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -309,7 +307,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -342,7 +340,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
