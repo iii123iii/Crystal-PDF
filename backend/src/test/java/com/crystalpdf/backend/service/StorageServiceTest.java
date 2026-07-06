@@ -70,7 +70,7 @@ class StorageServiceTest {
                 "file", "test.pdf", "application/pdf", pdfBytes);
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(any())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -118,7 +118,7 @@ class StorageServiceTest {
                 "file", "../../../etc/passwd.pdf", "application/pdf", pdfBytes);
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(any())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -134,7 +134,7 @@ class StorageServiceTest {
                 "file", "test.pdf", "text/plain", pdfBytes); // client sends wrong MIME
 
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(Collections.emptyList());
+        when(documentRepository.sumSizeBytesByOwnerId(any())).thenReturn(0L);
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Document doc = storageService.store(file, owner);
@@ -199,7 +199,7 @@ class StorageServiceTest {
         Document d2 = new Document();
         d2.setSizeBytes(2048L);
 
-        when(documentRepository.findByOwnerIdOrderByCreatedAtDesc(any())).thenReturn(java.util.List.of(d1, d2));
+        when(documentRepository.sumSizeBytesByOwnerId(any())).thenReturn(3072L);
         when(appSettingsRepository.findById(1L)).thenReturn(Optional.of(defaultSettings()));
 
         long[] info = storageService.getStorageInfo(owner);

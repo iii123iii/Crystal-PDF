@@ -71,8 +71,7 @@ public class StorageService {
         }
 
         // Check storage limit
-        List<Document> existingDocs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
-        long usedBytes = existingDocs.stream().mapToLong(Document::getSizeBytes).sum();
+        long usedBytes = documentRepository.sumSizeBytesByOwnerId(owner.getId());
         long limitBytes = owner.getStorageLimitBytes() != null ? owner.getStorageLimitBytes()
                 : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
         if (usedBytes + fileSizeBytes > limitBytes) {
@@ -179,8 +178,7 @@ public class StorageService {
      * Returns the user's storage usage and limit in bytes.
      */
     public long[] getStorageInfo(User owner) {
-        List<Document> docs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
-        long usedBytes = docs.stream().mapToLong(Document::getSizeBytes).sum();
+        long usedBytes = documentRepository.sumSizeBytesByOwnerId(owner.getId());
         AppSettings settings = appSettingsRepository.findById(1L).orElse(new AppSettings());
         long limitBytes = owner.getStorageLimitBytes() != null ? owner.getStorageLimitBytes()
                 : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
