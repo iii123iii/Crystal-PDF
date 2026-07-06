@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&display=swap');
+
+.landing-page .font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.landing-page .anim-reveal { animation: reveal .8s cubic-bezier(.16,1,.3,1) both; }
+.landing-page .anim-d1 { animation-delay: .08s; }
+.landing-page .anim-d2 { animation-delay: .16s; }
+.landing-page .anim-d3 { animation-delay: .24s; }
+.landing-page .anim-d4 { animation-delay: .36s; }
+.landing-page .anim-fade { animation: fade .6s ease both; }
+
+.landing-page .dot-grid {
+  background-image: radial-gradient(rgba(148,163,184,.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.landing-page .prism {
+  width: 340px;
+  height: 340px;
+  position: relative;
+}
+.landing-page .prism::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 160deg,
+    rgba(45,98,255,.18),
+    rgba(96,165,250,.12),
+    rgba(56,189,248,.08),
+    rgba(45,98,255,.04),
+    rgba(96,165,250,.14),
+    rgba(45,98,255,.18)
+  );
+  clip-path: polygon(50% 4%, 93% 28%, 93% 72%, 50% 96%, 7% 72%, 7% 28%);
+  animation: rotate-slow 40s linear infinite;
+}
+.landing-page .prism::after {
+  content: '';
+  position: absolute;
+  inset: 30px;
+  background: conic-gradient(
+    from 220deg,
+    rgba(96,165,250,.1),
+    transparent,
+    rgba(56,189,248,.06),
+    transparent,
+    rgba(96,165,250,.1)
+  );
+  clip-path: polygon(50% 6%, 91% 29%, 91% 71%, 50% 94%, 9% 71%, 9% 29%);
+  animation: rotate-slow 60s linear infinite reverse;
+}
+
+.landing-page .tool-card {
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.05);
+  transition: all .25s ease;
+}
+.landing-page .tool-card:hover {
+  background: rgba(255,255,255,.04);
+  border-color: rgba(96,165,250,.18);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 48px -12px rgba(0,0,0,.5), 0 0 0 1px rgba(96,165,250,.08);
+}
+
+.landing-page .step-connector {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(96,165,250,.2) 0px,
+    rgba(96,165,250,.2) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+/* ── Mobile (< 768px) ─────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .landing-page .landing-nav-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    height: 3.5rem;
+  }
+
+  .landing-page .landing-nav-logo {
+    font-size: 1rem;
+  }
+
+  .landing-page .landing-nav-actions {
+    gap: 0.25rem;
+  }
+
+  .landing-page .landing-nav-link {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .landing-page .landing-nav-cta {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .landing-page .landing-hero {
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .landing-page .landing-hero-copy {
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .landing-page .landing-hero-title {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    line-height: 1.15;
+  }
+
+  .landing-page .landing-hero-subtitle {
+    font-size: 0.9375rem;
+    margin-top: 1.25rem;
+    max-width: none;
+  }
+
+  .landing-page .landing-hero-actions {
+    margin-top: 1.75rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .landing-page .landing-hero-actions a {
+    justify-content: center;
+    width: 100%;
+    font-size: 0.9375rem;
+    padding-top: 0.875rem;
+    padding-bottom: 0.875rem;
+  }
+
+  .landing-page .landing-tools-section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .landing-page .landing-tools-header {
+    margin-bottom: 2rem;
+    text-align: center;
+    max-width: none;
+  }
+
+  .landing-page .landing-tools-title {
+    font-size: clamp(1.625rem, 7vw, 2.25rem);
+  }
+
+  .landing-page .landing-tools-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .landing-page .tool-card {
+    padding: 1rem 1.125rem;
+  }
+
+  .landing-page .tool-card:hover {
+    transform: none;
+  }
+
+  .landing-page .landing-steps-section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .landing-page .landing-steps-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .landing-page .landing-steps-title {
+    font-size: clamp(1.625rem, 7vw, 2.25rem);
+  }
+
+  .landing-page .landing-cta-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .landing-page .landing-cta-title {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    margin-bottom: 1.75rem;
+  }
+
+  .landing-page .landing-cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .landing-page .landing-cta-actions a {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .landing-page .landing-footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .landing-page .landing-glow-primary {
+    width: 520px;
+    height: 520px;
+  }
+
+  .landing-page .landing-glow-secondary {
+    width: 280px;
+    height: 280px;
+  }
+}

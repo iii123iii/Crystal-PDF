@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import './LandingPage.css'
 import {
   Scissors,
   Shield,
@@ -35,130 +36,35 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050e18] text-slate-200 relative">
-      {/* ── CSS ─────────────────────────────────────────────── */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&display=swap');
-
-        @keyframes reveal {
-          from { opacity: 0; transform: translateY(24px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fade {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes rotate-slow {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-
-        .anim-reveal { animation: reveal .8s cubic-bezier(.16,1,.3,1) both; }
-        .anim-d1 { animation-delay: .08s; }
-        .anim-d2 { animation-delay: .16s; }
-        .anim-d3 { animation-delay: .24s; }
-        .anim-d4 { animation-delay: .36s; }
-        .anim-fade { animation: fade .6s ease both; }
-
-        /* Dot grid texture */
-        .dot-grid {
-          background-image: radial-gradient(rgba(148,163,184,.07) 1px, transparent 1px);
-          background-size: 24px 24px;
-        }
-
-        /* Crystal prism */
-        .prism {
-          width: 340px;
-          height: 340px;
-          position: relative;
-        }
-        .prism::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: conic-gradient(
-            from 160deg,
-            rgba(45,98,255,.18),
-            rgba(96,165,250,.12),
-            rgba(56,189,248,.08),
-            rgba(45,98,255,.04),
-            rgba(96,165,250,.14),
-            rgba(45,98,255,.18)
-          );
-          clip-path: polygon(50% 4%, 93% 28%, 93% 72%, 50% 96%, 7% 72%, 7% 28%);
-          animation: rotate-slow 40s linear infinite;
-        }
-        .prism::after {
-          content: '';
-          position: absolute;
-          inset: 30px;
-          background: conic-gradient(
-            from 220deg,
-            rgba(96,165,250,.1),
-            transparent,
-            rgba(56,189,248,.06),
-            transparent,
-            rgba(96,165,250,.1)
-          );
-          clip-path: polygon(50% 6%, 91% 29%, 91% 71%, 50% 94%, 9% 71%, 9% 29%);
-          animation: rotate-slow 60s linear infinite reverse;
-        }
-
-        /* Feature card */
-        .tool-card {
-          background: rgba(255,255,255,.02);
-          border: 1px solid rgba(255,255,255,.05);
-          transition: all .25s ease;
-        }
-        .tool-card:hover {
-          background: rgba(255,255,255,.04);
-          border-color: rgba(96,165,250,.18);
-          transform: translateY(-2px);
-          box-shadow: 0 16px 48px -12px rgba(0,0,0,.5), 0 0 0 1px rgba(96,165,250,.08);
-        }
-
-        /* Step connector dash */
-        .step-connector {
-          width: 100%;
-          height: 1px;
-          background: repeating-linear-gradient(
-            90deg,
-            rgba(96,165,250,.2) 0px,
-            rgba(96,165,250,.2) 6px,
-            transparent 6px,
-            transparent 12px
-          );
-        }
-      `}</style>
-
+    <div className="landing-page min-h-screen bg-[#050e18] text-slate-200 relative">
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="landing-glow-primary absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
-        <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
+        <div className="landing-glow-secondary absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
       </div>
 
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
+        <div className="landing-nav-inner max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="landing-nav-logo font-display text-lg font-semibold tracking-tight text-white">
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="landing-nav-actions flex items-center gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="landing-nav-link text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="landing-nav-cta text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
                          px-4 py-2 rounded-lg transition-all">
               Get started
@@ -168,24 +74,24 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
+      <section className="landing-hero relative z-10 max-w-6xl mx-auto px-6
                           pt-20 pb-24 md:pt-32 md:pb-36
                           grid md:grid-cols-[1fr,auto] items-center gap-12">
         {/* Text column */}
-        <div className="max-w-2xl">
-          <h1 className="font-display font-semibold tracking-tight leading-[1.1]
+        <div className="landing-hero-copy max-w-2xl">
+          <h1 className="landing-hero-title font-display font-semibold tracking-tight leading-[1.1]
                          text-[clamp(2.2rem,5.5vw,4.8rem)] text-white anim-reveal">
             Every<br className="hidden sm:block" /> PDF tool<br className="hidden sm:block" /> you'll ever{' '}
             <em className="not-italic text-blue-400">need.</em>
           </h1>
 
-          <p className="mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
+          <p className="landing-hero-subtitle mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
                         text-slate-400 max-w-md anim-reveal anim-d2">
             Merge, split, compress, protect, convert, and annotate&nbsp;&mdash;
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="landing-hero-actions mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -216,13 +122,13 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="landing-tools-section max-w-6xl mx-auto px-6 py-24 md:py-32">
           {/* Section header */}
-          <div className="max-w-lg mb-14">
+          <div className="landing-tools-header max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               Toolkit
             </p>
-            <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
+            <h2 className="landing-tools-title font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
                            tracking-tight leading-[1.05] text-white">
               Everything in<br className="hidden sm:block" /> one workspace
             </h2>
@@ -232,7 +138,7 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="landing-tools-grid grid grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -255,12 +161,12 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
-          <div className="text-center max-w-lg mx-auto mb-16">
+        <div className="landing-steps-section max-w-3xl mx-auto px-6 py-24 md:py-32">
+          <div className="landing-steps-header text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>
-            <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
+            <h2 className="landing-steps-title font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
                            tracking-tight leading-[1.05] text-white">
               Three steps, that's it
             </h2>
@@ -309,7 +215,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="landing-cta-section max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -317,12 +223,12 @@ export default function LandingPage() {
           <p className="text-sm text-slate-500 mb-4 relative">
             Free to use. No credit card required.
           </p>
-          <h2 className="font-display text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold
+          <h2 className="landing-cta-title font-display text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold
                          tracking-tight leading-[.95] text-white mb-10 relative">
             Start working with<br />
             your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="landing-cta-actions relative flex flex-wrap justify-center gap-3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -342,7 +248,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="landing-footer-inner max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
