@@ -132,7 +132,7 @@ export default function LandingPage() {
       `}</style>
 
       {/* ── Ambient glow ───────────────────────────────────── */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
+      <div className="ambient-glow fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
         <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
@@ -140,7 +140,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Nav ────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
+      <nav className="landing-nav sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
@@ -168,8 +168,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
+      <section className="hero-section relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-32 md:pb-36
                           grid md:grid-cols-[1fr,auto] items-center gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
@@ -185,7 +184,7 @@ export default function LandingPage() {
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="hero-cta mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -232,7 +231,7 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="tools-grid tools-grid grid grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -254,7 +253,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it works ───────────────────────────────────── */}
-      <section className="relative z-10 border-t border-white/[.04]">
+      <section className="steps-section relative z-10 border-t border-white/[.04]">
         <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
           <div className="text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -308,7 +307,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ────────────────────────────────────────────── */}
-      <section className="relative z-10 border-t border-white/[.04]">
+      <section className="steps-section relative z-10 border-t border-white/[.04]">
         <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
@@ -322,7 +321,7 @@ export default function LandingPage() {
             Start working with<br />
             your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="cta-btns relative flex flex-wrap justify-center gap-3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -341,7 +340,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────── */}
-      <footer className="relative z-10 border-t border-white/[.04]">
+      <footer className="landing-footer relative z-10 border-t border-white/[.04]">
         <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
