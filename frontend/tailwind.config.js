@@ -7,6 +7,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        'xs': '375px',
+      },
       colors: {
         // Semantic tokens mapped to CSS variables
         surface: 'var(--color-surface)',
