@@ -48,6 +48,10 @@ export default function LandingPage() {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+          .hero-br { display: none; }
+        }
         @keyframes rotate-slow {
           from { transform: rotate(0deg); }
           to   { transform: rotate(360deg); }
@@ -71,6 +75,12 @@ export default function LandingPage() {
           width: 340px;
           height: 340px;
           position: relative;
+        }
+        @media (max-width: 640px) {
+          .prism {
+            width: 200px;
+            height: 200px;
+          }
         }
         .prism::before {
           content: '';
@@ -133,7 +143,7 @@ export default function LandingPage() {
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[500px] sm:w-[900px] h-[500px] sm:h-[900px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
         <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
@@ -142,7 +152,7 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
@@ -168,24 +178,24 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6
+                          pt-16 pb-16 sm:pt-20 sm:pb-24 md:pt-32 md:pb-36
+                          grid md:grid-cols-[1fr,auto] items-center gap-8 md:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
-                         text-[clamp(2.2rem,5.5vw,4.8rem)] text-white anim-reveal">
+                         text-[clamp(2rem,6vw,4.8rem)] text-white anim-reveal">
             Every<br className="hidden sm:block" /> PDF tool<br className="hidden sm:block" /> you'll ever{' '}
             <em className="not-italic text-blue-400">need.</em>
           </h1>
 
-          <p className="mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
+          <p className="mt-4 sm:mt-7 text-[clamp(0.9rem,1.8vw,1.2rem)] leading-relaxed
                         text-slate-400 max-w-md anim-reveal anim-d2">
             Merge, split, compress, protect, convert, and annotate&nbsp;&mdash;
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -216,15 +226,15 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-32">
           {/* Section header */}
-          <div className="max-w-lg mb-14">
+          <div className="max-w-lg mb-10 sm:mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               Toolkit
             </p>
             <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
                            tracking-tight leading-[1.05] text-white">
-              Everything in<br className="hidden sm:block" /> one workspace
+              Everything in one workspace
             </h2>
             <p className="mt-4 text-slate-500 leading-relaxed text-[15px]">
               Every operation produces a new file — your originals stay untouched.
@@ -232,19 +242,19 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
             {tools.map((t) => (
-              <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
-                <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
-                                flex items-center justify-center mb-4
+              <div key={t.name} className="tool-card rounded-2xl p-3 sm:p-5 cursor-default group">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
+                                flex items-center justify-center mb-2 sm:mb-4
                                 group-hover:bg-blue-400/[.12] group-hover:border-blue-400/[.2]
                                 transition-colors">
                   <t.icon size={18} className="text-blue-400" strokeWidth={1.8} />
                 </div>
-                <p className="text-[15px] font-semibold text-white tracking-tight mb-1">
+                <p className="text-[13px] sm:text-[15px] font-semibold text-white tracking-tight mb-1">
                   {t.name}
                 </p>
-                <p className="text-[13px] text-slate-500 leading-snug">
+                <p className="text-[11px] sm:text-[13px] text-slate-500 leading-snug">
                   {t.desc}
                 </p>
               </div>
@@ -255,8 +265,8 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
-          <div className="text-center max-w-lg mx-auto mb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-32">
+          <div className="text-center max-w-lg mx-auto mb-10 sm:mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>
@@ -270,10 +280,10 @@ export default function LandingPage() {
             {steps.map((s, i) => (
               <div key={s.num}>
                 {/* Step row */}
-                <div className="flex items-start gap-5">
+                <div className="flex items-start gap-3 sm:gap-5">
                   {/* Left: number + icon */}
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
                                     bg-brand-500/10 border border-brand-500/20 shrink-0">
                       <s.icon size={20} className="text-blue-400" strokeWidth={1.6} />
                     </div>
@@ -296,7 +306,7 @@ export default function LandingPage() {
                 {/* Connector between steps */}
                 {i < steps.length - 1 && (
                   <div className="flex items-stretch gap-5 py-1">
-                    <div className="w-12 flex justify-center shrink-0">
+                    <div className="w-10 sm:w-12 flex justify-center shrink-0">
                       <div className="w-px h-8 bg-gradient-to-b from-brand-500/20 to-transparent" />
                     </div>
                   </div>
@@ -309,7 +319,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -319,12 +329,11 @@ export default function LandingPage() {
           </p>
           <h2 className="font-display text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold
                          tracking-tight leading-[.95] text-white mb-10 relative">
-            Start working with<br />
-            your PDFs today.
+            Start working with your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="relative flex flex-col sm:flex-row justify-center gap-3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
@@ -332,7 +341,7 @@ export default function LandingPage() {
               Create free account <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-400 hover:text-slate-200 transition-colors">
               or sign in
             </Link>
@@ -342,11 +351,11 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
-          <p className="text-xs text-slate-700">
+          <p className="text-xs text-slate-700 text-center sm:text-left">
             Secure, server-side processing. Your files never leave your account.
           </p>
         </div>
