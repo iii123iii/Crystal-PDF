@@ -142,25 +142,25 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14 sm:h-16">
+          <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
-              <Gem size={14} className="text-white" />
+              <Gem size={13} className="text-white" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-white">
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="text-xs sm:text-sm text-slate-400 hover:text-white px-2.5 sm:px-4 py-1.5 sm:py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="text-xs sm:text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
-                         px-4 py-2 rounded-lg transition-all">
+                         px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
               Get started
             </Link>
           </div>
@@ -168,9 +168,9 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6
+                          pt-16 pb-20 sm:pt-20 sm:pb-24 md:pt-32 md:pb-36
+                          grid md:grid-cols-[1fr,auto] items-center gap-8 sm:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -234,17 +234,17 @@ export default function LandingPage() {
           {/* Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
-              <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
-                <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
-                                flex items-center justify-center mb-4
+              <div key={t.name} className="tool-card rounded-2xl p-3.5 sm:p-5 cursor-default group">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
+                                flex items-center justify-center mb-3 sm:mb-4
                                 group-hover:bg-blue-400/[.12] group-hover:border-blue-400/[.2]
                                 transition-colors">
-                  <t.icon size={18} className="text-blue-400" strokeWidth={1.8} />
+                  <t.icon size={16} className="sm:size-[18px] text-blue-400" strokeWidth={1.8} />
                 </div>
-                <p className="text-[15px] font-semibold text-white tracking-tight mb-1">
+                <p className="text-sm sm:text-[15px] font-semibold text-white tracking-tight mb-1">
                   {t.name}
                 </p>
-                <p className="text-[13px] text-slate-500 leading-snug">
+                <p className="text-[12px] sm:text-[13px] text-slate-500 leading-snug">
                   {t.desc}
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-24 md:py-32">
           <div className="text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
@@ -270,12 +270,12 @@ export default function LandingPage() {
             {steps.map((s, i) => (
               <div key={s.num}>
                 {/* Step row */}
-                <div className="flex items-start gap-5">
+                <div className="flex items-start gap-3 sm:gap-5">
                   {/* Left: number + icon */}
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
                                     bg-brand-500/10 border border-brand-500/20 shrink-0">
-                      <s.icon size={20} className="text-blue-400" strokeWidth={1.6} />
+                      <s.icon size={17} className="sm:size-[20px] text-blue-400" strokeWidth={1.6} />
                     </div>
                   </div>
 
@@ -295,8 +295,8 @@ export default function LandingPage() {
 
                 {/* Connector between steps */}
                 {i < steps.length - 1 && (
-                  <div className="flex items-stretch gap-5 py-1">
-                    <div className="w-12 flex justify-center shrink-0">
+                  <div className="flex items-stretch gap-3 sm:gap-5 py-1">
+                    <div className="w-10 sm:w-12 flex justify-center shrink-0">
                       <div className="w-px h-8 bg-gradient-to-b from-brand-500/20 to-transparent" />
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -342,11 +342,11 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col sm:flex-row items-center sm:justify-between gap-3 sm:gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
-          <p className="text-xs text-slate-700">
+          <p className="text-[11px] sm:text-xs text-slate-700 text-center sm:text-left">
             Secure, server-side processing. Your files never leave your account.
           </p>
         </div>
