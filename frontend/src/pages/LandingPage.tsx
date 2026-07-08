@@ -129,6 +129,55 @@ export default function LandingPage() {
             transparent 12px
           );
         }
+
+        /* ── Mobile Responsive ──────────────────────────── */
+        @media (max-width: 768px) {
+          .prism {
+            width: 220px;
+            height: 220px;
+          }
+          nav .max-w-6xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+          section[class*=\"pt-20\"] {
+            padding-top: 3rem !important;
+            padding-bottom: 3rem !important;
+          }
+          .tool-card {
+            padding: 1rem;
+          }
+          .tool-card p:first-of-type {
+            font-size: 13px;
+          }
+          .tool-card p:last-of-type {
+            font-size: 11px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .prism {
+            width: 160px;
+            height: 160px;
+          }
+          h1[class*=\"text-\\[clamp\"] {
+            font-size: 2rem !important;
+          }
+          h2[class*=\"text-\\[clamp\"] {
+            font-size: 1.6rem !important;
+          }
+          .grid-cols-2 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+          }
+          .flex-wrap.gap-3 {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .flex-wrap.gap-3 a {
+            text-align: center;
+            justify-content: center;
+          }
+        }
       `}</style>
 
       {/* ── Ambient glow ───────────────────────────────────── */}
