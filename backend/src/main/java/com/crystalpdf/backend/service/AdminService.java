@@ -10,12 +10,11 @@ import com.crystalpdf.backend.repository.AppSettingsRepository;
 import com.crystalpdf.backend.repository.DocumentRepository;
 import com.crystalpdf.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.io.File;
@@ -46,48 +45,40 @@ public class AdminService {
     }
 
     public Page<AdminUserResponse> getAllUsers(int page, int pageSize, String search, String filter) {
-        List<User> allUsers = userRepository.findAll();
-
-        // Apply search filter
-        if (search != null && !search.isBlank()) {
-            String q = search.toLowerCase();
-            allUsers = allUsers.stream()
-                    .filter(u -> u.getEmail().toLowerCase().contains(q) ||
-                            u.getDisplayUsername().toLowerCase().contains(q))
-                    .toList();
+        String searchPattern = search != null && !search.isBlank()
+                ? "%" + search.toLowerCase() + "%"
+                : null;
+        Boolean adminOnly = null;
+        if ("admin".equalsIgnoreCase(filter)) {
+            adminOnly = true;
+        } else if ("regular".equalsIgnoreCase(filter)) {
+            adminOnly = false;
         }
 
-        // Apply admin filter
-        if (filter != null && !filter.isBlank()) {
-            if ("admin".equalsIgnoreCase(filter)) {
-                allUsers = allUsers.stream().filter(User::isAdmin).toList();
-            } else if ("regular".equalsIgnoreCase(filter)) {
-                allUsers = allUsers.stream().filter(u -> !u.isAdmin()).toList();
-            }
-        }
+        Page<User> users = userRepository.findForAdminList(searchPattern, adminOnly, PageRequest.of(page, pageSize));
+        List<Long> userIds = users.getContent().stream().map(User::getId).toList();
+        Map<Long, DocumentRepository.OwnerStorageStats> storageStats = userIds.isEmpty()
+                ? Map.of()
+                : documentRepository.findStorageStatsByOwnerIds(userIds).stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            DocumentRepository.OwnerStorageStats::getOwnerId,
+                            stats -> stats
+                    ));
+        AppSettings settings = getSettingsEntity();
 
-        // Convert to responses
-        List<AdminUserResponse> responses = allUsers.stream().map(user -> {
-            List<Document> docs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(user.getId());
-            long storageUsed = docs.stream().mapToLong(Document::getSizeBytes).sum();
-            AppSettings settings = getSettingsEntity();
+        return users.map(user -> {
+            DocumentRepository.OwnerStorageStats stats = storageStats.get(user.getId());
+            long storageUsed = stats != null && stats.getTotalSizeBytes() != null ? stats.getTotalSizeBytes() : 0L;
+            int fileCount = stats != null && stats.getFileCount() != null ? Math.toIntExact(stats.getFileCount()) : 0;
             long limitBytes = user.getStorageLimitBytes() != null ? user.getStorageLimitBytes()
                     : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
             return new AdminUserResponse(
                     user.getId(), user.getEmail(), user.getDisplayUsername(),
                     user.isAdmin(), user.isPasswordChangeRequired(),
-                    limitBytes, storageUsed, docs.size(),
+                    limitBytes, storageUsed, fileCount,
                     user.getCreatedAt() != null ? user.getCreatedAt().toString() : ""
             );
-        }).toList();
-
-        // Apply pagination
-        int start = page * pageSize;
-        int end = Math.min(start + pageSize, responses.size());
-        List<AdminUserResponse> pageContent = responses.subList(start, end);
-        int totalPages = (int) Math.ceil((double) responses.size() / pageSize);
-
-        return new PageImpl<>(pageContent, PageRequest.of(page, pageSize), responses.size());
+        });
     }
 
     public void setStorageLimit(Long userId, Long limitBytes) {
@@ -167,7 +158,7 @@ public class AdminService {
         // Platform stats
         info.put("totalUsers", userRepository.count());
         info.put("totalFiles", documentRepository.count());
-        info.put("totalAdmins", userRepository.findAll().stream().filter(User::isAdmin).count());
+        info.put("totalAdmins", userRepository.countByAdminTrue());
         info.put("javaVersion", System.getProperty("java.version"));
         info.put("osName", System.getProperty("os.name"));
 
