@@ -133,9 +133,9 @@ export default function LandingPage() {
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="absolute -top-[20%] max-md:-top-[10%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] max-md:w-[400px] max-md:h-[400px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
-        <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
+        <div className="absolute top-[55%] max-md:top-[80%] -right-[10%] max-md:-right-[20%] w-[500px] h-[500px] max-md:w-[250px] max-md:h-[250px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
       </div>
 
@@ -169,23 +169,23 @@ export default function LandingPage() {
 
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
+                          pt-16 pb-20 md:pt-32 md:pb-36
                           grid md:grid-cols-[1fr,auto] items-center gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
                          text-[clamp(2.2rem,5.5vw,4.8rem)] text-white anim-reveal">
-            Every<br className="hidden sm:block" /> PDF tool<br className="hidden sm:block" /> you'll ever{' '}
+            Every<br className="hidden max-md:hidden sm:block" /> PDF tool<br className="hidden sm:block" /> you'll ever{' '}
             <em className="not-italic text-blue-400">need.</em>
           </h1>
 
-          <p className="mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
+          <p className="mt-7 text-[clamp(0.9rem,3.5vw,1.2rem)] leading-relaxed
                         text-slate-400 max-w-md anim-reveal anim-d2">
             Merge, split, compress, protect, convert, and annotate&nbsp;&mdash;
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -256,7 +256,7 @@ export default function LandingPage() {
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
         <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
-          <div className="text-center max-w-lg mx-auto mb-16">
+          <div className="text-center max-w-lg mx-auto mb-8 md:mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>
@@ -295,7 +295,7 @@ export default function LandingPage() {
 
                 {/* Connector between steps */}
                 {i < steps.length - 1 && (
-                  <div className="flex items-stretch gap-5 py-1">
+                  <div className="flex flex-col md:flex-row items-stretch gap-5 py-1">
                     <div className="w-12 flex justify-center shrink-0">
                       <div className="w-px h-8 bg-gradient-to-b from-brand-500/20 to-transparent" />
                     </div>
@@ -309,7 +309,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -342,7 +342,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between flex-wrap gap-4 text-center md:text-left">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
