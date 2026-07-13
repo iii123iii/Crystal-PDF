@@ -12,6 +12,11 @@ export default {
         surface: 'var(--color-surface)',
         border: 'var(--color-border)',
         muted: 'var(--color-muted)',
+        brand: {
+          400: '#60a5fa',
+          500: '#2d62ff',
+          600: '#1d4ed8',
+        },
         // Category colors
         cat: {
           organize: '#3b82f6',
