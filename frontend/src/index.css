@@ -37,16 +37,32 @@
     height: 100%;
   }
 
+  /* Prevent horizontal scroll on mobile from absolutely-positioned decorative elements */
+  html, body {
+    overflow-x: hidden;
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Respect mobile safe areas (notches, home indicators) */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   * {
     border-color: var(--color-border);
+  }
+}
+
+/* ── Mobile responsive utilities ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Ensure tap targets are at least 44px (Apple HIG / WCAG 2.5.5) */
+  .mobile-tap {
+    min-height: 44px;
   }
 }
 
