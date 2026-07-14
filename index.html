@@ -1,0 +1,71 @@
+/* ============================================
+   CSS RESPONSIVE - PLANTILLA
+   ============================================ */
+
+/* Mobile First (320px - 480px) */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    padding: 16px;
+}
+
+/* Tablets (481px - 768px) */
+@media (min-width: 481px) {
+    .container {
+        padding: 24px;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+}
+
+/* Desktop (769px - 1024px) */
+@media (min-width: 769px) {
+    .container {
+        padding: 32px;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+}
+
+/* Large Desktop (1025px+) */
+@media (min-width: 1025px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+/* Touch Targets - mínimo 44px para móvil */
+button, a {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 24px;
+}
+
+/* Imágenes responsivas */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Grid responsive */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 481px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 769px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
