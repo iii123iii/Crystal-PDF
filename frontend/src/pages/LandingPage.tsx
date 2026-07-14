@@ -129,6 +129,88 @@ export default function LandingPage() {
             transparent 12px
           );
         }
+
+        /* ── Responsive Mobile Styles ──────────────────────── */
+        @media (max-width: 768px) {
+          .prism {
+            width: 200px !important;
+            height: 200px !important;
+          }
+          
+          .tool-card {
+            padding: 1rem !important;
+          }
+          
+          .grid-cols-2 {
+            grid-template-columns: 1fr !important;
+          }
+          
+          .grid-cols-3 {
+            grid-template-columns: 1fr !important;
+          }
+          
+          .grid-cols-4 {
+            grid-template-columns: 1fr 1fr !important;
+          }
+          
+          .gap-6 {
+            gap: 1rem !important;
+          }
+          
+          .gap-8 {
+            gap: 1.5rem !important;
+          }
+          
+          .text-5xl {
+            font-size: 2rem !important;
+          }
+          
+          .text-6xl {
+            font-size: 2.5rem !important;
+          }
+          
+          .text-7xl {
+            font-size: 3rem !important;
+          }
+          
+          .px-8 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          .py-20 {
+            padding-top: 3rem !important;
+            padding-bottom: 3rem !important;
+          }
+          
+          .py-32 {
+            padding-top: 4rem !important;
+            padding-bottom: 4rem !important;
+          }
+          
+          .container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          .flex-col {
+            flex-direction: column !important;
+          }
+          
+          .hidden-mobile {
+            display: none !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .grid-cols-4 {
+            grid-template-columns: 1fr !important;
+          }
+          
+          .text-4xl {
+            font-size: 1.5rem !important;
+          }
+        }
       `}</style>
 
       {/* ── Ambient glow ───────────────────────────────────── */}
