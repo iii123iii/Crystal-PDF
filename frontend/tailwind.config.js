@@ -12,6 +12,12 @@ export default {
         surface: 'var(--color-surface)',
         border: 'var(--color-border)',
         muted: 'var(--color-muted)',
+        // Brand — blue accent scale (was missing, caused all brand-* classes to render invisible)
+        brand: {
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+        },
         // Category colors
         cat: {
           organize: '#3b82f6',
