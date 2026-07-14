@@ -35,7 +35,7 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050e18] text-slate-200 relative">
+    <div className="min-h-screen bg-[#050e18] text-slate-200 relative overflow-x-hidden">
       {/* ── CSS ─────────────────────────────────────────────── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&display=swap');
@@ -140,7 +140,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Nav ────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
+      <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04] pt-[env(safe-area-inset-top)]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
@@ -154,11 +154,11 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-3 sm:px-4 py-2 transition-colors">
+              className="inline-flex items-center min-h-11 text-sm text-slate-400 hover:text-white px-3 sm:px-4 py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="inline-flex items-center min-h-11 text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
                          px-3 sm:px-4 py-2 rounded-lg transition-all whitespace-nowrap">
               Get started
