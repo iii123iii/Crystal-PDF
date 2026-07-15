@@ -31,12 +31,11 @@ public class PdfToImageService {
             for (int i = 0; i < doc.getNumberOfPages(); i++) {
                 BufferedImage image = renderer.renderImageWithDPI(i, dpi, ImageType.RGB);
 
-                ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
-                ImageIO.write(image, imageioFormat, imgOut);
-
                 ZipEntry entry = new ZipEntry(String.format("page_%03d.%s", i + 1, fmt));
                 zos.putNextEntry(entry);
-                zos.write(imgOut.toByteArray());
+                if (!ImageIO.write(image, imageioFormat, zos)) {
+                    throw new IOException("Unsupported image output format: " + imageioFormat);
+                }
                 zos.closeEntry();
             }
 
