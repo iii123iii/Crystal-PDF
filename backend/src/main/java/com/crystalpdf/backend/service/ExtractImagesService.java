@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -24,7 +25,12 @@ public class ExtractImagesService {
      * Extract all images from a PDF and return them as a ZIP file.
      */
     public byte[] extractImages(byte[] pdfBytes, String format) throws IOException {
-        String imgFormat = (format != null && !format.isBlank()) ? format : "png";
+        String imgFormat = (format != null && !format.isBlank())
+                ? format.toLowerCase(Locale.ROOT)
+                : "png";
+        if (!imgFormat.equals("png") && !imgFormat.equals("jpg") && !imgFormat.equals("jpeg")) {
+            throw new IllegalArgumentException("Unsupported image output format: " + imgFormat);
+        }
 
         try (PDDocument doc = Loader.loadPDF(new RandomAccessReadBuffer(pdfBytes));
              ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
@@ -35,18 +41,20 @@ public class ExtractImagesService {
             for (int pageIdx = 0; pageIdx < doc.getNumberOfPages(); pageIdx++) {
                 PDPage page = doc.getPage(pageIdx);
                 PDResources resources = page.getResources();
-                if (resources == null) continue;
+                if (resources == null) {
+                    continue;
+                }
 
                 for (COSName name : resources.getXObjectNames()) {
                     PDXObject xobj = resources.getXObject(name);
                     if (xobj instanceof PDImageXObject image) {
                         BufferedImage bimg = image.getImage();
-                        ByteArrayOutputStream imgBytes = new ByteArrayOutputStream();
-                        ImageIO.write(bimg, imgFormat, imgBytes);
 
                         String entryName = String.format("page%d_img%d.%s", pageIdx + 1, imgIndex++, imgFormat);
                         zos.putNextEntry(new ZipEntry(entryName));
-                        zos.write(imgBytes.toByteArray());
+                        if (!ImageIO.write(bimg, imgFormat, zos)) {
+                            throw new IllegalArgumentException("Unsupported image output format: " + imgFormat);
+                        }
                         zos.closeEntry();
                     }
                 }
