@@ -70,4 +70,16 @@ describe('LandingPage responsive layout', () => {
     expect(indexHtml).toContain('viewport-fit=cover')
     expect(indexHtml).toContain('name="theme-color"')
   })
+
+  it('honors reduced-motion preferences for decorative animation', () => {
+    const { container } = renderLandingPage()
+    const styles = container.querySelector('style')?.textContent
+
+    expect(styles).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(styles).toContain('.anim-reveal')
+    expect(styles).toContain('.prism::before')
+    expect(styles).toContain('.tool-card:hover')
+    expect(styles).toContain('animation: none')
+    expect(styles).toContain('transition: none')
+  })
 })

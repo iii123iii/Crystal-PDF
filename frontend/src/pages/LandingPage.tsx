@@ -129,6 +129,23 @@ export default function LandingPage() {
             transparent 12px
           );
         }
+
+        @media (prefers-reduced-motion: reduce) {
+          .anim-reveal,
+          .anim-fade,
+          .prism::before,
+          .prism::after {
+            animation: none;
+          }
+
+          .tool-card {
+            transition: none;
+          }
+
+          .tool-card:hover {
+            transform: none;
+          }
+        }
       `}</style>
 
       {/* ── Ambient glow ───────────────────────────────────── */}
