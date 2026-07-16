@@ -82,4 +82,21 @@ describe('LandingPage responsive layout', () => {
     expect(styles).toContain('animation: none')
     expect(styles).toContain('transition: none')
   })
+
+  it('keeps decorative glows bounded by the viewport on phones', () => {
+    const { container } = renderLandingPage()
+    const styles = container.querySelector('style')?.textContent
+
+    expect(styles).toContain('.ambient-glow-primary')
+    expect(styles).toContain('width: min(900px, 150vw)')
+    expect(styles).toContain('height: min(900px, 150vw)')
+    expect(styles).toContain('.ambient-glow-secondary')
+    expect(styles).toContain('width: min(500px, 115vw)')
+    expect(styles).toContain('height: min(500px, 115vw)')
+
+    const glowLayer = container.querySelector('[aria-hidden="true"]')
+    expect(glowLayer?.className).toContain('overflow-hidden')
+    expect(glowLayer?.querySelector('.ambient-glow-primary')).toBeTruthy()
+    expect(glowLayer?.querySelector('.ambient-glow-secondary')).toBeTruthy()
+  })
 })

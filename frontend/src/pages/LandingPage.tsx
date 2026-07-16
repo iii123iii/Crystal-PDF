@@ -66,6 +66,15 @@ export default function LandingPage() {
           background-size: 24px 24px;
         }
 
+        .ambient-glow-primary {
+          width: min(900px, 150vw);
+          height: min(900px, 150vw);
+        }
+        .ambient-glow-secondary {
+          width: min(500px, 115vw);
+          height: min(500px, 115vw);
+        }
+
         /* Crystal prism */
         .prism {
           width: 340px;
@@ -150,9 +159,9 @@ export default function LandingPage() {
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="ambient-glow-primary absolute -top-[30%] left-1/2 -translate-x-1/2 rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
-        <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
+        <div className="ambient-glow-secondary absolute top-[55%] -right-[10%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
       </div>
 
