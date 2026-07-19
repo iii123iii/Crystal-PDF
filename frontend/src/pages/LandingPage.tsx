@@ -68,8 +68,8 @@ export default function LandingPage() {
 
         /* Crystal prism */
         .prism {
-          width: 340px;
-          height: 340px;
+          width: clamp(200px, 60vw, 340px);
+          height: clamp(200px, 60vw, 340px);
           position: relative;
         }
         .prism::before {
@@ -133,16 +133,16 @@ export default function LandingPage() {
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[clamp(300px,90vw,900px)] h-[clamp(300px,90vw,900px)] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
-        <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
+        <div className="absolute top-[55%] -right-[10%] w-[clamp(200px,60vw,500px)] h-[clamp(200px,60vw,500px)] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
       </div>
 
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
@@ -152,7 +152,7 @@ export default function LandingPage() {
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/login"
               className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
               Sign in
@@ -342,7 +342,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
