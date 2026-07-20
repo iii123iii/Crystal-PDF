@@ -25,7 +25,7 @@ public class AdminDataInitializer {
             // Credentials are read from application.yml (environment-configurable).
             // Once created, admin password is not auto-reset (prevent privilege escalation).
             // To recover a lost admin password, manually set a new one via database or admin console.
-            boolean adminExists = userRepo.findAll().stream().anyMatch(User::isAdmin);
+            boolean adminExists = userRepo.existsByAdminTrue();
             if (!adminExists) {
                 User admin = new User();
                 admin.setEmail(adminEmail);
