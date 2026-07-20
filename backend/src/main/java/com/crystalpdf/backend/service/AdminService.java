@@ -68,15 +68,15 @@ public class AdminService {
 
         // Convert to responses
         List<AdminUserResponse> responses = allUsers.stream().map(user -> {
-            List<Document> docs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(user.getId());
-            long storageUsed = docs.stream().mapToLong(Document::getSizeBytes).sum();
+            long storageUsed = documentRepository.sumSizeBytesByOwnerId(user.getId());
+            int documentCount = (int) documentRepository.countByOwner_Id(user.getId());
             AppSettings settings = getSettingsEntity();
             long limitBytes = user.getStorageLimitBytes() != null ? user.getStorageLimitBytes()
                     : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
             return new AdminUserResponse(
                     user.getId(), user.getEmail(), user.getDisplayUsername(),
                     user.isAdmin(), user.isPasswordChangeRequired(),
-                    limitBytes, storageUsed, docs.size(),
+                    limitBytes, storageUsed, documentCount,
                     user.getCreatedAt() != null ? user.getCreatedAt().toString() : ""
             );
         }).toList();
@@ -167,7 +167,7 @@ public class AdminService {
         // Platform stats
         info.put("totalUsers", userRepository.count());
         info.put("totalFiles", documentRepository.count());
-        info.put("totalAdmins", userRepository.findAll().stream().filter(User::isAdmin).count());
+        info.put("totalAdmins", userRepository.countByAdminTrue());
         info.put("javaVersion", System.getProperty("java.version"));
         info.put("osName", System.getProperty("os.name"));
 
