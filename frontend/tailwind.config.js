@@ -6,7 +6,10 @@ export default {
   ],
   darkMode: 'class',
   theme: {
-    extend: {
+   extend: {
+      screens: {
+        xs: '400px',
+      },
       colors: {
         // Semantic tokens mapped to CSS variables
         surface: 'var(--color-surface)',
