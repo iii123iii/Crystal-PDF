@@ -49,7 +49,7 @@ export default function RegisterPage() {
       <BrandPanel />
 
       {/* Form panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#0c1829]">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:p-8 bg-[#0c1829]">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-10 lg:hidden">
@@ -57,7 +57,7 @@ export default function RegisterPage() {
             <span className="text-white font-semibold tracking-wide text-sm">Crystal PDF</span>
           </div>
 
-          <h2 className="font-display text-4xl font-semibold text-white leading-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-white leading-tight">
             Create your<br /><em className="not-italic text-blue-400">account.</em>
           </h2>
           <p className="mt-2 text-slate-400 text-sm">Free forever. No credit card required.</p>

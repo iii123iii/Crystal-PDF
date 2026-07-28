@@ -53,7 +53,7 @@ export default function LoginPage() {
       <BrandPanel />
 
       {/* Form panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#0c1829]">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:p-8 bg-[#0c1829]">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-10 lg:hidden">
@@ -61,7 +61,7 @@ export default function LoginPage() {
             <span className="text-white font-semibold tracking-wide text-sm">Crystal PDF</span>
           </div>
 
-          <h2 className="font-display text-4xl font-semibold text-white leading-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold text-white leading-tight">
             Welcome<br /><em className="not-italic text-blue-400">back.</em>
           </h2>
           <p className="mt-2 text-slate-400 text-sm">Sign in to your account to continue.</p>
