@@ -37,16 +37,60 @@
     height: 100%;
   }
 
+  /* Safe-area insets for notched devices */
+  :root {
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-right: env(safe-area-inset-right, 0);
+    --safe-bottom: env(safe-area-inset-bottom, 0);
+    --safe-left: env(safe-area-inset-left, 0);
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal overflow */
+    overflow-x: hidden;
+    /* Safe-area padding for body */
+    padding-bottom: max(var(--safe-bottom), 0);
   }
 
   * {
     border-color: var(--color-border);
+    /* Prevent horizontal overflow on all elements */
+    box-sizing: border-box;
+  }
+
+  /* Touch targets - minimum 44x44px touch targets for accessibility */
+  button,
+  [role="button"],
+  a[href],
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent overscroll bounce on iOS */
+  html, body {
+    overscroll-behavior: contain;
+  }
+
+  /* Prevent text size adjust on orientation change */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Improved text rendering on mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 
@@ -66,6 +110,27 @@
 .tool-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+
+/* ── Safe-area utility classes ─────────────────────────────────────────────── */
+.safe-top { padding-top: max(var(--safe-top), 0); }
+.safe-bottom { padding-bottom: max(var(--safe-bottom), 0); }
+.safe-left { padding-left: max(var(--safe-left), 0); }
+.safe-right { padding-right: max(var(--safe-right), 0); }
+.safe-x { padding-left: max(var(--safe-left), 0); padding-right: max(var(--safe-right), 0); }
+.safe-y { padding-top: max(var(--safe-top), 0); padding-bottom: max(var(--safe-bottom), 0); }
+.safe-all { padding: max(var(--safe-top), 0) max(var(--safe-right), 0) max(var(--safe-bottom), 0) max(var(--safe-left), 0); }
+
+/* ── Mobile utilities ──────────────────────────────────────────────────────── */
+/* Ensure full-width buttons on mobile */
+@media (max-width: 639px) {
+  .btn-mobile-full {
+    width: 100%;
+  }
+  /* Prevent text from being too small on mobile */
+  .text-mobile-sm { font-size: 0.875rem; line-height: 1.25rem; }
+  .text-mobile-base { font-size: 1rem; line-height: 1.5rem; }
+  .text-mobile-lg { font-size: 1.125rem; line-height: 1.75rem; }
 }
 
 /* ── Category section fade-in ────────────────────────────────────────────── */
