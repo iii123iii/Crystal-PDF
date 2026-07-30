@@ -1,0 +1,3 @@
+@media (max-width: 768px) { .landing-page { flex-direction: column; } }
+/* Optimized loading */
+.important-fix { display: block; }
