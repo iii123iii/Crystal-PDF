@@ -148,7 +148,7 @@ export default function LandingPage() {
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-white">
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
@@ -170,7 +170,7 @@ export default function LandingPage() {
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative z-10 max-w-6xl mx-auto px-6
                           pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+                          grid md:grid-cols-[1fr,auto] items-center gap-6 sm:gap-8 lg:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16 lg:py-24 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -232,7 +232,7 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -255,8 +255,8 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
-          <div className="text-center max-w-lg mx-auto mb-16">
+        <div className="max-w-3xl mx-auto px-6 py-12 sm:py-16 lg:py-24 md:py-32">
+          <div className="text-center max-w-lg mx-auto mb-8 sm:mb-12 lg:mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>

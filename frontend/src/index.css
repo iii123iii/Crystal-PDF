@@ -101,3 +101,40 @@
   background-color: rgba(59, 130, 246, 0.28);
   color: transparent;
 }
+
+/* === Mobile Responsive Enhancements === */
+@media (max-width: 768px) {
+  /* Force single-column on small screens for flex containers */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  /* Ensure images don't overflow */
+  img, svg {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Touch-friendly buttons */
+  button, a.btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Hamburger menu visibility */
+  .mobile-menu-btn {
+    display: block;
+  }
+  .nav-links:not(.open) {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+  .nav-links {
+    display: flex;
+  }
+}
