@@ -154,7 +154,7 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="text-sm text-slate-400 hover:text-white px-2 sm:px-4 py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
@@ -169,23 +169,23 @@ export default function LandingPage() {
 
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
+                          pt-12 pb-16 md:pt-32 md:pb-36
                           grid md:grid-cols-[1fr,auto] items-center gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
-                         text-[clamp(2.2rem,5.5vw,4.8rem)] text-white anim-reveal">
-            Every<br className="hidden sm:block" /> PDF tool<br className="hidden sm:block" /> you'll ever{' '}
+                         text-[clamp(1.8rem,5.5vw,4.8rem)] text-white anim-reveal">
+            Every<br className="block" /> PDF tool<br className="block" /> you'll ever{' '}
             <em className="not-italic text-blue-400">need.</em>
           </h1>
 
-          <p className="mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
+          <p className="mt-7 text-[clamp(0.9rem,1.8vw,1.2rem)] leading-relaxed
                         text-slate-400 max-w-md anim-reveal anim-d2">
             Merge, split, compress, protect, convert, and annotate&nbsp;&mdash;
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-3 anim-reveal anim-d3">
             <Link to="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
@@ -216,15 +216,15 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               Toolkit
             </p>
-            <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
+            <h2 className="font-display text-[clamp(1.6rem,4.5vw,3.5rem)] font-semibold
                            tracking-tight leading-[1.05] text-white">
-              Everything in<br className="hidden sm:block" /> one workspace
+              Everything in<br className="block" /> one workspace
             </h2>
             <p className="mt-4 text-slate-500 leading-relaxed text-[15px]">
               Every operation produces a new file — your originals stay untouched.
@@ -232,7 +232,7 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -255,12 +255,12 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-3xl mx-auto px-6 py-16 md:py-32">
           <div className="text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>
-            <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-semibold
+            <h2 className="font-display text-[clamp(1.6rem,4.5vw,3.5rem)] font-semibold
                            tracking-tight leading-[1.05] text-white">
               Three steps, that's it
             </h2>
@@ -309,7 +309,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -317,7 +317,7 @@ export default function LandingPage() {
           <p className="text-sm text-slate-500 mb-4 relative">
             Free to use. No credit card required.
           </p>
-          <h2 className="font-display text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold
+          <h2 className="font-display text-[clamp(1.8rem,5.5vw,4.5rem)] font-semibold
                          tracking-tight leading-[.95] text-white mb-10 relative">
             Start working with<br />
             your PDFs today.
