@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import defaultTheme from 'tailwindcss/defaultTheme'
+
 export default {
   content: [
     './index.html',
@@ -6,6 +8,10 @@ export default {
   ],
   darkMode: 'class',
   theme: {
+    screens: {
+      xs: '475px',
+      ...defaultTheme.screens,
+    },
     extend: {
       colors: {
         // Semantic tokens mapped to CSS variables
@@ -18,6 +24,13 @@ export default {
           convert:  '#8b5cf6',
           security: '#ef4444',
           optimize: '#10b981',
+        },
+        // Brand palette for landing page / marketing
+        brand: {
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
         },
       },
       fontFamily: {
