@@ -66,11 +66,27 @@ export default function LandingPage() {
           background-size: 24px 24px;
         }
 
-        /* Crystal prism */
+        /* Crystal prism — scale down on mobile */
         .prism {
           width: 340px;
           height: 340px;
           position: relative;
+        }
+
+        /* ── Mobile responsive overrides ────────────────────── */
+        @media (max-width: 640px) {
+          .prism {
+            width: 200px;
+            height: 200px;
+            transform: scale(.9);
+          }
+          .prism::after {
+            inset: 18px;
+          }
+          .hero-br { display: none; }
+          .tool-card { padding: 1rem; }
+          .tool-card p { font-size: 12px; }
+          .tool-card p:first-of-type { font-size: 14px; }
         }
         .prism::before {
           content: '';
@@ -142,25 +158,25 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14 sm:h-16">
+          <Link to="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="font-display text-base sm:text-lg font-semibold tracking-tight text-white">
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="text-xs sm:text-sm text-slate-400 hover:text-white px-2.5 sm:px-4 py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="text-xs sm:text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
-                         px-4 py-2 rounded-lg transition-all">
+                         px-2.5 sm:px-4 py-2 rounded-lg transition-all whitespace-nowrap">
               Get started
             </Link>
           </div>
