@@ -214,7 +214,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Tools grid ───────────────────────────────────── */}
+      {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-32">
           {/* Section header */}
