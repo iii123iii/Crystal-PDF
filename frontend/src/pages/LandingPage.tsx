@@ -35,7 +35,7 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050e18] text-slate-200 relative">
+    <div className="min-h-screen overflow-x-hidden bg-[#050e18] text-slate-200 relative">
       {/* ── CSS ─────────────────────────────────────────────── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&display=swap');
@@ -142,25 +142,25 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
+          <Link to="/" aria-label="CrystalPDF home" className="flex shrink-0 items-center gap-2 sm:gap-2.5 py-1.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="hidden min-[360px]:inline font-display text-base sm:text-lg font-semibold tracking-tight text-white">
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="inline-flex min-h-11 items-center whitespace-nowrap text-sm text-slate-400 hover:text-white px-2 sm:px-4 py-2.5 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="inline-flex min-h-11 items-center text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
-                         px-4 py-2 rounded-lg transition-all">
+                         whitespace-nowrap px-3 sm:px-4 py-2.5 rounded-lg transition-all">
               Get started
             </Link>
           </div>
@@ -168,9 +168,9 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6
+                          pt-14 pb-16 sm:pt-20 sm:pb-24 md:pt-32 md:pb-36
+                          grid md:grid-cols-[1fr,auto] items-center gap-8 sm:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -179,15 +179,15 @@ export default function LandingPage() {
             <em className="not-italic text-blue-400">need.</em>
           </h1>
 
-          <p className="mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
+          <p className="mt-5 sm:mt-7 text-[clamp(1rem,1.8vw,1.2rem)] leading-relaxed
                         text-slate-400 max-w-md anim-reveal anim-d2">
             Merge, split, compress, protect, convert, and annotate&nbsp;&mdash;
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 anim-reveal anim-d3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
@@ -195,7 +195,7 @@ export default function LandingPage() {
               Start for free <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-300 border border-white/10 hover:border-white/20
                          hover:bg-white/[.03] transition-all">
               Sign in to workspace
@@ -214,11 +214,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Tools grid ─────────────────────────────────────── */}
+      {/* ── Tools grid ───────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-32">
           {/* Section header */}
-          <div className="max-w-lg mb-14">
+          <div className="max-w-lg mb-10 sm:mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               Toolkit
             </p>
@@ -232,9 +232,9 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <ul aria-label="PDF tools" className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-3">
             {tools.map((t) => (
-              <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
+              <li key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
                                 flex items-center justify-center mb-4
                                 group-hover:bg-blue-400/[.12] group-hover:border-blue-400/[.2]
@@ -247,16 +247,16 @@ export default function LandingPage() {
                 <p className="text-[13px] text-slate-500 leading-snug">
                   {t.desc}
                 </p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
-          <div className="text-center max-w-lg mx-auto mb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-32">
+          <div className="text-center max-w-lg mx-auto mb-10 sm:mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
             </p>
@@ -270,7 +270,7 @@ export default function LandingPage() {
             {steps.map((s, i) => (
               <div key={s.num}>
                 {/* Step row */}
-                <div className="flex items-start gap-5">
+                <div className="flex items-start gap-4 sm:gap-5">
                   {/* Left: number + icon */}
                   <div className="flex flex-col items-center">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center
@@ -295,7 +295,7 @@ export default function LandingPage() {
 
                 {/* Connector between steps */}
                 {i < steps.length - 1 && (
-                  <div className="flex items-stretch gap-5 py-1">
+                  <div className="flex items-stretch gap-4 sm:gap-5 py-1">
                     <div className="w-12 flex justify-center shrink-0">
                       <div className="w-px h-8 bg-gradient-to-b from-brand-500/20 to-transparent" />
                     </div>
@@ -309,7 +309,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -317,14 +317,14 @@ export default function LandingPage() {
           <p className="text-sm text-slate-500 mb-4 relative">
             Free to use. No credit card required.
           </p>
-          <h2 className="font-display text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold
-                         tracking-tight leading-[.95] text-white mb-10 relative">
-            Start working with<br />
+          <h2 className="font-display text-[clamp(2.25rem,5.5vw,4.5rem)] font-semibold
+                         tracking-tight leading-none sm:leading-[.95] text-white mb-8 sm:mb-10 relative">
+            Start working with<br className="hidden sm:block" />
             your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
@@ -332,7 +332,7 @@ export default function LandingPage() {
               Create free account <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-400 hover:text-slate-200 transition-colors">
               or sign in
             </Link>
@@ -342,7 +342,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
