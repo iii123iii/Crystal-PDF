@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Scissors,
@@ -14,6 +15,8 @@ import {
   Gem,
   Pen,
   FileOutput,
+  Menu,
+  X,
 } from 'lucide-react'
 
 const tools = [
@@ -34,6 +37,8 @@ const steps = [
 ]
 
 export default function LandingPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-[#050e18] text-slate-200 relative overflow-x-clip">
       {/* ── CSS ─────────────────────────────────────────────── */}
@@ -152,7 +157,7 @@ export default function LandingPage() {
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="hidden shrink-0 items-center gap-1.5 sm:flex sm:gap-2">
             <Link to="/login"
               className="text-xs sm:text-sm text-slate-400 hover:text-white px-2.5 sm:px-4 py-2 whitespace-nowrap transition-colors">
               Sign in
@@ -164,7 +169,40 @@ export default function LandingPage() {
               Get started
             </Link>
           </div>
+          <button
+            type="button"
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10
+                       text-slate-300 transition-colors hover:border-white/20 hover:bg-white/[.04] hover:text-white sm:hidden"
+          >
+            {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
+        {isMenuOpen && (
+          <div className="border-t border-white/[.06] px-4 pb-4 sm:hidden">
+            <div className="mx-auto flex max-w-sm flex-col gap-2 pt-3">
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/10
+                           px-4 text-sm font-medium text-slate-300 transition-colors hover:border-white/20 hover:bg-white/[.04] hover:text-white"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-brand-500/25
+                           bg-brand-500/15 px-4 text-sm font-medium text-blue-300 transition-all
+                           hover:border-brand-500/40 hover:bg-brand-500/25"
+              >
+                Get started
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
