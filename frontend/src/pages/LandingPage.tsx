@@ -68,8 +68,8 @@ export default function LandingPage() {
 
         /* Crystal prism */
         .prism {
-          width: 340px;
-          height: 340px;
+          width: min(340px, 70vw);
+          height: min(340px, 70vw);
           position: relative;
         }
         .prism::before {
@@ -185,19 +185,19 @@ export default function LandingPage() {
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-3 anim-reveal anim-d3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
-                         hover:-translate-y-px active:translate-y-0 transition-all">
+                         hover:-translate-y-px active:translate-y-0 transition-all w-full sm:w-auto">
               Start for free <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-300 border border-white/10 hover:border-white/20
-                         hover:bg-white/[.03] transition-all">
+                         hover:bg-white/[.03] transition-all w-full sm:w-auto">
               Sign in to workspace
             </Link>
           </div>
@@ -232,7 +232,7 @@ export default function LandingPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -322,18 +322,18 @@ export default function LandingPage() {
             Start working with<br />
             your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="relative flex flex-col sm:flex-row flex-wrap justify-center gap-3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
-                         hover:-translate-y-px transition-all">
+                         hover:-translate-y-px transition-all w-full sm:w-auto">
               Create free account <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
-                         text-slate-400 hover:text-slate-200 transition-colors">
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+                         text-slate-400 hover:text-slate-200 transition-colors w-full sm:w-auto">
               or sign in
             </Link>
           </div>
