@@ -70,9 +70,8 @@ public class StorageService {
                     settings.getMaxUploadSizeMb() + " MB.");
         }
 
-        // Check storage limit
-        List<Document> existingDocs = documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
-        long usedBytes = existingDocs.stream().mapToLong(Document::getSizeBytes).sum();
+        // Check storage limit - use SUM query instead of loading all documents
+        long usedBytes = documentRepository.sumSizeBytesByOwnerId(owner.getId());
         long limitBytes = owner.getStorageLimitBytes() != null ? owner.getStorageLimitBytes()
                 : settings.getDefaultStorageLimitMb() * 1024L * 1024L;
         if (usedBytes + fileSizeBytes > limitBytes) {
