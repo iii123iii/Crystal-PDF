@@ -19,6 +19,22 @@ export default {
           security: '#ef4444',
           optimize: '#10b981',
         },
+        // Brand color palette (used on LandingPage & CTA accents)
+        brand: {
+          50:  '#eef4ff',
+          100: '#d9e5ff',
+          200: '#bcd0ff',
+          300: '#8eb3ff',
+          400: '#598aff',
+          500: '#2d62ff',
+          600: '#1a44f5',
+          700: '#1431e1',
+          800: '#1628b6',
+          900: '#18278f',
+        },
+      },
+      screens: {
+        'xs': '420px',
       },
       fontFamily: {
         sans:    ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
