@@ -160,11 +160,11 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Link to="/login"
-              className="text-xs sm:text-sm text-slate-400 hover:text-white px-2.5 sm:px-4 py-1.5 sm:py-2 transition-colors">
+              className="min-h-11 inline-flex items-center text-xs sm:text-sm text-slate-400 hover:text-white px-2.5 sm:px-4 py-1.5 sm:py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-xs sm:text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="min-h-11 inline-flex items-center text-xs sm:text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
                          px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
               Get started
