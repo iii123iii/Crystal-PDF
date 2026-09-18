@@ -1,0 +1,51 @@
+{
+  "baseline_revision": "0df8ff502800c0919484b05d6915e180c074821a",
+  "baseline_browser": {
+    "passed": 46,
+    "failed": 10,
+    "observedAt": "2026-09-18T06:50:15.323Z",
+    "mode": "development server with external requests blocked"
+  },
+  "candidate_production_browser": {
+    "passed": 56,
+    "failed": 0,
+    "observedAt": "2026-09-18T07:04:27.604Z",
+    "mode": "production preview with external requests blocked"
+  },
+  "candidate_production_google_fonts": {
+    "passed": 63,
+    "failed": 0,
+    "observedAt": "2026-09-18T07:04:50.708Z",
+    "mode": "production preview, only Google Fonts origins additionally allowed"
+  },
+  "viewport_widths": [
+    320,
+    360,
+    390,
+    640,
+    768,
+    1024,
+    1440
+  ],
+  "new_component_tests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "baseline_full_unit_suite": {
+    "passed": 59,
+    "failed": 1
+  },
+  "candidate_full_unit_suite": {
+    "passed": 64,
+    "failed": 1
+  },
+  "preexisting_full_suite_failure": "src/lib/api.test.ts > apiFetch > passes options to fetch: expected options omit production credentials: include",
+  "build_passed": true,
+  "targeted_lint_passed": true,
+  "screenshots": "Earlier development-server comparison, unchanged LandingPage candidate; production revalidation recorded separately.",
+  "limits": [
+    "Chromium rendering and local SPA navigation, not physical mobile Safari testing.",
+    "No backend requests, uploads, user login, payments, or production deployment were performed.",
+    "The 44-pixel target is a chosen test criterion, not an assertion that the bounty specified a formal accessibility standard."
+  ]
+}
