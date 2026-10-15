@@ -142,8 +142,9 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 min-h-16
+                        sm:flex-nowrap sm:px-6 sm:py-0 sm:h-16">
+          <Link to="/" className="flex shrink-0 items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
@@ -152,7 +153,7 @@ export default function LandingPage() {
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">
             <Link to="/login"
               className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
               Sign in
@@ -168,9 +169,9 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6
+                          pt-12 pb-16 sm:pt-20 sm:pb-24 md:pt-32 md:pb-36
+                          grid md:grid-cols-[minmax(0,1fr),auto] items-center gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -204,7 +205,7 @@ export default function LandingPage() {
         </div>
 
         {/* Crystal visual */}
-        <div className="hidden md:flex items-center justify-center anim-fade anim-d4">
+        <div className="hidden md:flex items-center justify-center overflow-hidden anim-fade anim-d4" aria-hidden="true">
           <div className="prism">
             {/* Inner facets */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -216,7 +217,7 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 sm:py-24 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -255,7 +256,7 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-3xl mx-auto px-4 py-16 sm:px-6 sm:py-24 md:py-32">
           <div className="text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
@@ -309,7 +310,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 sm:py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -342,7 +343,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
