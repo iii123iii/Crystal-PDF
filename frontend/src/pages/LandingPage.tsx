@@ -71,6 +71,7 @@ export default function LandingPage() {
           width: 340px;
           height: 340px;
           position: relative;
+          overflow: hidden;
         }
         .prism::before {
           content: '';
@@ -142,8 +143,8 @@ export default function LandingPage() {
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-2 px-4 py-2 sm:px-6 sm:h-16 sm:flex-nowrap sm:py-0">
+          <Link to="/" className="flex min-h-11 shrink-0 items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
               <Gem size={14} className="text-white" />
@@ -152,15 +153,15 @@ export default function LandingPage() {
               Crystal<span className="text-blue-400">PDF</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors sm:flex-none">
               Sign in
             </Link>
             <Link to="/register"
-              className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
+              className="inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
-                         px-4 py-2 rounded-lg transition-all">
+                         px-4 py-2 rounded-lg transition-all sm:flex-none">
               Get started
             </Link>
           </div>
