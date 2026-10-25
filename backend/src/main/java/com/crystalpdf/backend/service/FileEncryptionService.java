@@ -15,6 +15,9 @@ public class FileEncryptionService {
     private static final int IV_LENGTH_BYTES = 12;
     private static final int GCM_TAG_BITS = 128;
 
+    // Static reusable SecureRandom to avoid expensive re-seeding on every encrypt call
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     // Fallback dev key: 32-byte hex string (AES-256)  — "crystalpdfencrypt1234567890abcde"
     private static final String DEV_KEY_HEX = "6372797374616c706466656e6372797074313233343536373839306162636465";
 
@@ -35,7 +38,7 @@ public class FileEncryptionService {
     public byte[] encrypt(byte[] plaintext) {
         try {
             byte[] iv = new byte[IV_LENGTH_BYTES];
-            new SecureRandom().nextBytes(iv);
+            SECURE_RANDOM.nextBytes(iv);
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE,
@@ -59,6 +62,10 @@ public class FileEncryptionService {
      */
     public byte[] decrypt(byte[] data) {
         try {
+            if (data == null || data.length < IV_LENGTH_BYTES + (GCM_TAG_BITS / 8)) {
+                throw new IllegalArgumentException("Encrypted data is too short to be valid.");
+            }
+
             byte[] iv = new byte[IV_LENGTH_BYTES];
             System.arraycopy(data, 0, iv, 0, IV_LENGTH_BYTES);
 
@@ -77,16 +84,16 @@ public class FileEncryptionService {
         }
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
     private static byte[] hexToBytes(String hex) {
-        if (hex.length() % 2 != 0) {
-            throw new IllegalArgumentException("Hex string must have even length");
+        int len = hex.length();
+        if (len % 2 != 0) {
+            throw new IllegalArgumentException("Invalid hex key length: " + len);
         }
-        byte[] bytes = new byte[hex.length() / 2];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                    + Character.digit(hex.charAt(i + 1), 16));
         }
-        return bytes;
+        return data;
     }
 }
