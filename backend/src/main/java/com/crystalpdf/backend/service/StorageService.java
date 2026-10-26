@@ -142,7 +142,7 @@ public class StorageService {
 
         Document doc = new Document();
         doc.setOwner(owner);
-        doc.setOriginalName(sanitizeFilename(originalName));
+        doc.setOriginalName(sanitizeFilename(originalName, "application/zip".equals(mimeType) ? ".zip" : ".pdf"));
         doc.setStoredName(storedName);
         doc.setMimeType(mimeType != null ? mimeType : "application/pdf");
         doc.setSizeBytes(originalSize);
@@ -210,13 +210,18 @@ public class StorageService {
      * Prevents path traversal via filename and double-extension attacks.
      */
     private String sanitizeFilename(String name) {
+        return sanitizeFilename(name, ".pdf");
+    }
+
+    /** Uses a server-selected extension for processed files, never the supplied filename's extension. */
+    private String sanitizeFilename(String name, String extension) {
         // Strip any path separators
         String base = Paths.get(name).getFileName().toString();
-        // Strip everything after the last dot and force .pdf
+        // Strip everything after the last dot and apply the trusted extension
         int dot = base.lastIndexOf('.');
         String stem = dot > 0 ? base.substring(0, dot) : base;
         // Remove any characters that are not safe in a display filename
         stem = stem.replaceAll("[^a-zA-Z0-9 _\\-()]", "_");
-        return stem.isBlank() ? "document.pdf" : stem + ".pdf";
+        return (stem.isBlank() ? "document" : stem) + extension;
     }
 }
