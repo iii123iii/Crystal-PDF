@@ -264,6 +264,9 @@ public class WorkspaceToolController {
             @PathVariable Long id, @PathVariable Long sourceId,
             @AuthenticationPrincipal User user) throws IOException {
         Document target = loadOwned(id, user);
+        if (id.equals(sourceId)) {
+            throw new IllegalArgumentException("Source and target documents must be different.");
+        }
         Document source = loadOwned(sourceId, user);
         byte[] bytes = storageService.loadBytes(source);
         storageService.replaceFile(target, bytes);
