@@ -43,6 +43,7 @@ describe('apiFetch', () => {
     expect(fetchSpy).toHaveBeenCalledWith('/api/documents', {
       method: 'POST',
       body: JSON.stringify({ name: 'test' }),
+      credentials: 'include',
     })
   })
 
