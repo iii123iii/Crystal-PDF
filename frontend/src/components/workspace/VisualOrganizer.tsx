@@ -133,8 +133,10 @@ export function VisualOrganizer({ pdfDoc, documentId, pdfPassword, onClose, onSa
   function deleteSingle(pos: number) {
     setPages((prev) => prev.filter((_, i) => i !== pos))
     setSelectedIdxs((prev) => {
-      const next = new Set(prev)
-      next.delete(pos)
+      const next = new Set<number>()
+      for (const idx of prev) {
+        if (idx !== pos) next.add(idx > pos ? idx - 1 : idx)
+      }
       return next
     })
   }
@@ -149,6 +151,22 @@ export function VisualOrganizer({ pdfDoc, documentId, pdfPassword, onClose, onSa
     setPages((prev) =>
       prev.map((p, i) => i === pos ? { ...p, rotation: (p.rotation + 90) % 360 } : p)
     )
+  }
+
+  function movePage(from: number, to: number) {
+    setPages((prev) => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
+      return next
+    })
+    // Selection stores positions, so move it with the same original pages.
+    setSelectedIdxs((prev) => new Set([...prev].map((idx) => {
+      if (idx === from) return to
+      if (from < to && idx > from && idx <= to) return idx - 1
+      if (from > to && idx >= to && idx < from) return idx + 1
+      return idx
+    })))
   }
 
   // ── Mouse drag & drop ─────────────────────────────────────────────────────
@@ -172,12 +190,7 @@ export function VisualOrganizer({ pdfDoc, documentId, pdfPassword, onClose, onSa
   function handleDrop(e: React.DragEvent, targetPos: number) {
     e.preventDefault()
     if (draggedPos === null || draggedPos === targetPos) { setDraggedPos(null); setDropTargetPos(null); return }
-    setPages((prev) => {
-      const next = [...prev]
-      const [moved] = next.splice(draggedPos, 1)
-      next.splice(targetPos, 0, moved)
-      return next
-    })
+    movePage(draggedPos, targetPos)
     setDraggedPos(null)
     setDropTargetPos(null)
   }
@@ -199,12 +212,7 @@ export function VisualOrganizer({ pdfDoc, documentId, pdfPassword, onClose, onSa
     const from = touchDragPosRef.current
     const to   = touchDropTargetRef.current
     if (from !== null && to !== null && from !== to) {
-      setPages((prev) => {
-        const next = [...prev]
-        const [moved] = next.splice(from, 1)
-        next.splice(to, 0, moved)
-        return next
-      })
+      movePage(from, to)
     }
     touchDragPosRef.current    = null
     touchDropTargetRef.current = null
