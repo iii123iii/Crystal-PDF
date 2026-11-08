@@ -133,8 +133,10 @@ export function VisualOrganizer({ pdfDoc, documentId, pdfPassword, onClose, onSa
   function deleteSingle(pos: number) {
     setPages((prev) => prev.filter((_, i) => i !== pos))
     setSelectedIdxs((prev) => {
-      const next = new Set(prev)
-      next.delete(pos)
+      const next = new Set<number>()
+      for (const idx of prev) {
+        if (idx !== pos) next.add(idx > pos ? idx - 1 : idx)
+      }
       return next
     })
   }
