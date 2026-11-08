@@ -66,16 +66,28 @@ export function useAnnotations() {
   }, [])
 
   /**
-   * Erase any stroke whose points come within `radius` (normalized) of (x, y).
+   * Erase any stroke whose path comes within `radius` (normalized) of (x, y).
    * This removes the entire stroke — "stroke eraser" mode.
    */
   const eraseAt = useCallback((page: number, x: number, y: number, radius: number) => {
     setPages(prev => {
       const cur = prev[page] ?? EMPTY
       const remaining = cur.strokes.filter(stroke =>
-        !stroke.points.some(([px, py]) =>
-          Math.hypot(px - x, py - y) < radius
-        )
+        !stroke.points.some(([px, py], i) => {
+          if (Math.hypot(px - x, py - y) < radius) return true
+          if (i === 0) return false
+
+          // The canvas joins sampled points with straight line segments.
+          const [ax, ay] = stroke.points[i - 1]
+          const dx = px - ax
+          const dy = py - ay
+          const lengthSquared = dx * dx + dy * dy
+          if (lengthSquared === 0) return false
+          const t = Math.max(0, Math.min(1,
+            ((x - ax) * dx + (y - ay) * dy) / lengthSquared,
+          ))
+          return Math.hypot(ax + t * dx - x, ay + t * dy - y) < radius
+        })
       )
       if (remaining.length === cur.strokes.length) return prev
       return { ...prev, [page]: { ...cur, strokes: remaining } }
