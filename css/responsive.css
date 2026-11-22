@@ -1,0 +1,207 @@
+/* ==========================================================================
+   Crystal-PDF — Responsive landing page styles (issue #3)
+   "Make the landing page responsive for mobile."
+
+   Strategy
+   --------
+   Mobile-first. Base rules target small screens; min-width media queries
+   progressively enhance to tablet and desktop. No horizontal scroll at any
+   width >= 320px. Touch targets >= 44px. Fluid typography via clamp().
+
+   Drop this file in as `assets/css/responsive.css` (or merge into the
+   existing stylesheet) and ensure the landing page <head> includes:
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  line-height: 1.5;
+  /* Fluid base font: 16px on small phones up to 18px on large screens. */
+  font-size: clamp(1rem, 0.95rem + 0.4vw, 1.125rem);
+  color: #1a1a2e;
+  background: #ffffff;
+  /* Prevent accidental horizontal scroll from wide children. */
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Layout containers -------------------------------------------------- */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  /* Fluid side padding: 16px on phones, more on wider screens. */
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+/* ---- Header / nav ------------------------------------------------------- */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 0.75rem;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.site-nav a {
+  /* Ensure comfortable tap targets on touch devices. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+
+.hero {
+  text-align: center;
+  padding-block: clamp(2rem, 8vw, 5rem);
+}
+
+.hero__title {
+  /* Fluid hero heading. */
+  font-size: clamp(1.75rem, 1.2rem + 3.2vw, 3.25rem);
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+
+.hero__subtitle {
+  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.375rem);
+  max-width: 60ch;
+  margin-inline: auto;
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Buttons ------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Full-width, easy-to-tap buttons on mobile. */
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn--primary {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.btn--secondary {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+/* ---- Feature / card grid ------------------------------------------------ */
+
+/* Single column by default (mobile). */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.card {
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+/* ---- Footer ------------------------------------------------------------- */
+
+.site-footer {
+  text-align: center;
+  padding-block: 2rem;
+  font-size: 0.9375rem;
+  color: #6b7280;
+}
+
+/* ==========================================================================
+   Breakpoints — progressive enhancement
+   ========================================================================== */
+
+/* Small tablets / large phones (>= 480px): side-by-side hero buttons. */
+@media (min-width: 480px) {
+  .hero__actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .hero__actions .btn {
+    width: auto;
+  }
+}
+
+/* Tablets (>= 768px): 2-column feature grid. */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero {
+    text-align: left;
+  }
+  .hero__subtitle {
+    margin-inline: 0;
+  }
+}
+
+/* Desktop (>= 1024px): 3-column feature grid. */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==========================================================================
+   Motion & accessibility preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
