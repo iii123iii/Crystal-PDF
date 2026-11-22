@@ -35,7 +35,7 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050e18] text-slate-200 relative">
+    <div className="min-h-screen bg-[#050e18] text-slate-200 relative overflow-x-hidden">
       {/* ── CSS ─────────────────────────────────────────────── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&display=swap');
@@ -66,10 +66,10 @@ export default function LandingPage() {
           background-size: 24px 24px;
         }
 
-        /* Crystal prism */
+        /* Crystal prism — fluid so it never overflows narrow viewports */
         .prism {
-          width: 340px;
-          height: 340px;
+          width: clamp(180px, 42vw, 340px);
+          height: clamp(180px, 42vw, 340px);
           position: relative;
         }
         .prism::before {
@@ -129,20 +129,33 @@ export default function LandingPage() {
             transparent 12px
           );
         }
+
+        /* Respect users who prefer reduced motion: disable decorative animation */
+        @media (prefers-reduced-motion: reduce) {
+          .anim-reveal,
+          .anim-fade,
+          .prism::before,
+          .prism::after {
+            animation: none !important;
+          }
+          .tool-card:hover {
+            transform: none !important;
+          }
+        }
       `}</style>
 
       {/* ── Ambient glow ───────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full"
+        <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[900px] max-w-full h-[900px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(45,98,255,.1) 0%, transparent 65%)' }} />
-        <div className="absolute top-[55%] -right-[10%] w-[500px] h-[500px] rounded-full"
+        <div className="absolute top-[55%] -right-[10%] w-[500px] max-w-full h-[500px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%)' }} />
       </div>
 
       {/* ── Nav ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-white/[.04]"
         style={{ background: 'rgba(5,14,24,.75)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-400 flex items-center justify-center
                             shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
@@ -154,13 +167,13 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/login"
-              className="text-sm text-slate-400 hover:text-white px-4 py-2 transition-colors">
+              className="text-sm text-slate-400 hover:text-white px-3 sm:px-4 py-2 transition-colors">
               Sign in
             </Link>
             <Link to="/register"
               className="text-sm font-medium text-blue-300 bg-brand-500/15 hover:bg-brand-500/25
                          border border-brand-500/25 hover:border-brand-500/40
-                         px-4 py-2 rounded-lg transition-all">
+                         px-3 sm:px-4 py-2 rounded-lg transition-all">
               Get started
             </Link>
           </div>
@@ -168,9 +181,9 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6
-                          pt-20 pb-24 md:pt-32 md:pb-36
-                          grid md:grid-cols-[1fr,auto] items-center gap-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6
+                          pt-16 pb-20 sm:pt-20 sm:pb-24 md:pt-32 md:pb-36
+                          grid md:grid-cols-[1fr,auto] items-center gap-10 md:gap-12">
         {/* Text column */}
         <div className="max-w-2xl">
           <h1 className="font-display font-semibold tracking-tight leading-[1.1]
@@ -185,9 +198,9 @@ export default function LandingPage() {
             from one elegant workspace. No subscriptions, no upload limits.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-3 anim-reveal anim-d3">
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 anim-reveal anim-d3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
@@ -195,7 +208,7 @@ export default function LandingPage() {
               Start for free <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-300 border border-white/10 hover:border-white/20
                          hover:bg-white/[.03] transition-all">
               Sign in to workspace
@@ -216,7 +229,7 @@ export default function LandingPage() {
 
       {/* ── Tools grid ─────────────────────────────────────── */}
       <section className="relative z-10 dot-grid">
-        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24 md:py-32">
           {/* Section header */}
           <div className="max-w-lg mb-14">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
@@ -231,8 +244,8 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Grid — single column on the smallest phones, 2-up from 400px, 4-up on desktop */}
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-4 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="tool-card rounded-2xl p-5 cursor-default group">
                 <div className="w-10 h-10 rounded-xl bg-blue-400/[.08] border border-blue-400/[.12]
@@ -255,7 +268,7 @@ export default function LandingPage() {
 
       {/* ── How it works ───────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-20 sm:py-24 md:py-32">
           <div className="text-center max-w-lg mx-auto mb-16">
             <p className="text-xs font-medium tracking-[.15em] uppercase text-brand-400 mb-4">
               How it works
@@ -309,7 +322,7 @@ export default function LandingPage() {
 
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-28 md:py-36 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 sm:py-28 md:py-36 text-center">
           {/* Soft top glow */}
           <div className="absolute inset-x-0 top-0 h-64 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 50% 100% at 50% 0%, rgba(45,98,255,.06), transparent)' }} />
@@ -322,9 +335,9 @@ export default function LandingPage() {
             Start working with<br />
             your PDFs today.
           </h2>
-          <div className="relative flex flex-wrap justify-center gap-3">
+          <div className="relative flex flex-col sm:flex-row justify-center gap-3">
             <Link to="/register"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-white bg-gradient-to-b from-brand-500 to-brand-600
                          shadow-[0_2px_24px_rgba(45,98,255,.35)]
                          hover:shadow-[0_4px_32px_rgba(45,98,255,.5)]
@@ -332,7 +345,7 @@ export default function LandingPage() {
               Create free account <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
             <Link to="/login"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-medium
                          text-slate-400 hover:text-slate-200 transition-colors">
               or sign in
             </Link>
@@ -342,7 +355,7 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[.04]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex items-center justify-between flex-wrap gap-4">
           <span className="font-display text-sm font-semibold text-slate-600">
             Crystal<span className="text-blue-400/50">PDF</span>
           </span>
